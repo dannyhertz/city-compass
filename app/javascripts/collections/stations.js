@@ -12,16 +12,36 @@ define([
     model: Station,
     url: '/api/stations',
 
-    initialize: function () {},
+    initialize: function (attrs, opts) {
+      if (!opts.user) {
+        throw new Error('Stations must have user references.');
+      }
 
-    comparator: function (station) {
-      console.log('reference is', this.referencePoint);
-      return this.referencePoint ? station.distanceBetween(this.referencePoint) : 1;
+      this.userReference = opts.user;
     },
 
-    updateReferencePoint: function (newPoint) {
-      this.referencePoint = newPoint;
-      this.sort();
+    comparator: function (station) {
+      var compareVal;
+
+      compareVal = station.distanceBetween(this.userReference);
+      if (this.hasComparePenalty(station)) {
+        compareVal *= 100;
+      }
+
+      return compareVal;
+    },
+
+    hasComparePenalty: function (station) {
+      var searchMode = this.userReference.getSearchMode(),
+          availabilityMethod;
+
+      if (searchMode === 'bike') {
+        availabilityMethod = 'hasAvailableBikes';
+      } else {
+        availabilityMethod = 'hasAvailableDocks';
+      }
+
+      return !station[availabilityMethod]();
     }
   });
 

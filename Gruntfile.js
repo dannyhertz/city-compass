@@ -61,14 +61,14 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp}'
         ]
       },
-      jst: {
-        files: ['<%= yeoman.app %>/javascripts/templates/*.ejs'],
-        tasks: ['jst']
+      handlebars: {
+        files: ['<%= yeoman.app %>/javascripts/templates/*.hbs'],
+        tasks: ['handlebars']
       }
     },
     clean: {
-      dev: ['<%= yeoman.app %>/javascripts/templates.js'],
-      dist: ['<%= yeoman.app %>/javascripts/templates.js', '<%= yeoman.dist %>/*']
+      dist: ['.tmp', '<%= yeoman.dist %>/*'],
+      server: '.tmp'
     },
     jshint: {
       options: {
@@ -103,19 +103,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    useminPrepare: {
-      html: '<%= yeoman.app %>/index.html',
-      options: {
-        dest: '<%= yeoman.dist %>'
-      }
-    },
-    usemin: {
-      html: ['<%= yeoman.dist %>/{,*/}*.html'],
-      css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
-      options: {
-        dirs: ['<%= yeoman.dist %>']
-      }
-    },
     imagemin: {
       dist: {
         files: [{
@@ -138,17 +125,7 @@ module.exports = function (grunt) {
     },
     htmlmin: {
       dist: {
-        options: {
-          /*removeCommentsFromCDATA: true,
-          // https://github.com/yeoman/grunt-usemin/issues/44
-          //collapseWhitespace: true,
-          collapseBooleanAttributes: true,
-          removeAttributeQuotes: true,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeOptionalTags: true*/
-        },
+        options: {},
         files: [{
           expand: true,
           cwd: '<%= yeoman.app %>',
@@ -177,22 +154,27 @@ module.exports = function (grunt) {
         rjsConfig: '<%= yeoman.app %>/javascripts/main.js'
       }
     },
-    jst: {
-      options: {
-        amd: true
-      },
+    handlebars: {
       compile: {
+        options: {
+          namespace: 'JST',
+          amd: true
+        },
         files: {
-          '<%= yeoman.app %>/javascripts/templates.js': ['<%= yeoman.app %>/javascripts/templates/*.ejs']
+          '.tmp/javascripts/templates.js': ['<%= yeoman.app %>/javascripts/templates/*.hbs']
         }
       }
     }
   });
 
+  grunt.registerTask('createDefaultTemplate', function () {
+    grunt.file.write('.tmp/javascripts/templates.js', 'this.JST = this.JST || {};');
+  });
+
   grunt.registerTask('build', [
     'clean:dist',
-    'jst',
-    'useminPrepare',
+    'createDefaultTemplate',
+    'handlebars',
     'requirejs',
     'imagemin',
     'htmlmin',
@@ -200,18 +182,19 @@ module.exports = function (grunt) {
     'cssmin',
     'uglify',
     'copy',
-    'usemin'
   ]);
 
   grunt.registerTask('server', [
-    'jst',
+    'createDefaultTemplate',
+    'handlebars',
     'express:dev',
     'watch'
   ]);
 
   grunt.registerTask('test', [
     'clean:server',
-    'jst',
+    'createDefaultTemplate',
+    'handlebars',
     'connect:test',
     'jasmine'
   ]);

@@ -21,7 +21,7 @@ define([], function() {
     return R * c;
   }
 
-  var withGeo = {
+  return {
     getCoordinates: function () {
       return this.get('coordinates') || {
         latitude: 0,
@@ -29,10 +29,20 @@ define([], function() {
       };
     },
 
-    distanceBetween: function (otherGeo) {
-      return distanceBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
+    setCoordinates: function (coords) {
+      return this.set('coordinates', coords);
+    },
+
+    distanceBetween: function (otherGeo, unit) {
+      var unit = unit === 'ft' ? 'ft' : 'm',
+          distance;
+
+      distance = distanceBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
+      if (unit === 'ft') {
+        distance *= 3.28084;
+      }
+
+      return parseInt(distance, 10);
     }
   }
-
-  return withGeo;
 });

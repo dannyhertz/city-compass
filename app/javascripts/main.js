@@ -21,6 +21,7 @@ require.config({
     jquery: '../bower_components/jquery/jquery',
     backbone: '../bower_components/backbone-amd/backbone',
     underscore: '../bower_components/underscore-amd/underscore',
+    text: '../bower_components/requirejs-text/text',
     handlebars: '../bower_components/handlebars/handlebars'
   }
 });
@@ -28,11 +29,12 @@ require.config({
 require([
   'jquery',
   'backbone',
-  'views/app',
-  'collections/stations'
-], function ($, Backbone, AppView, Stations) {
+  'views/app_view'
+], function ($, Backbone, AppView) {
 
-  var stations = new Stations();
-  window.stations = stations;
+  var $mainContainer, appView;
+
+  $mainContainer = $('#main-view');
+  appView = new AppView({ el: $mainContainer }).render();
 
 });

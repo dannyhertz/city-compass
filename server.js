@@ -44,6 +44,7 @@ app.get('/api/stations', function (req, res) {
       delete s.postalCode;
       delete s.location;
       delete s.altitude;
+      delete s.lastCommunicationTime;
     });
 
     res.json(stationList);
