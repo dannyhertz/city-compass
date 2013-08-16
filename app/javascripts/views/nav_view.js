@@ -18,14 +18,14 @@ define([
 
     initialize: function (opts) {
       this.currentUser = opts.user;
-      this.listenTo(this.currentUser, 'change:searchMode', this.render);
+      this.listenTo(this.currentUser, 'change:searchMode', this.updateModeToggle);
     },
 
     render: function () {
       var templateData = { searchMode: this.currentUser.get('searchMode') };
       this.$el.html(this.template(templateData));
 
-      this.$modeBtn = this.$('.mode-link');
+      this.$modeToggle = this.$('.mode-toggle');
 
       return this;
     },
@@ -35,6 +35,11 @@ define([
 
       var targetMode = $(e.currentTarget).data('type');
       this.currentUser.setSearchMode(targetMode);
+    },
+
+    updateModeToggle: function (user, mode) {
+      this.$modeToggle.removeClass('bike-mode dock-mode');
+      this.$modeToggle.addClass(mode + '-mode');
     }
   });
 
