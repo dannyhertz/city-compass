@@ -76,6 +76,7 @@ header {
   color: #ffffff;
   background-color: #428bca;
   border-color: #357ebd;
+  text-decoration: none;
 }
 .mode-toggle a:first-child {
   border-top-right-radius: 0;

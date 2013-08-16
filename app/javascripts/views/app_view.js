@@ -19,8 +19,6 @@ define([
     initialize: function () {
       this.currentUser = new User();
       this.currentUser.startGeoListening();
-
-      this.listenTo(this.currentUser, 'change:coordinates', this.onUserLocationChange);
     },
 
     render: function () {
@@ -31,10 +29,6 @@ define([
       this.dashView = new DashView({ user: this.currentUser, el: this.$('.dash-view') }).render();
 
       return this;
-    },
-
-    onUserLocationChange: function (user, coordinates) {
-      // console.log('new user location:', coordinates);
     }
   });
 
