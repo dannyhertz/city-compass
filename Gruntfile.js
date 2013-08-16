@@ -7,7 +7,7 @@ module.exports = function (grunt) {
   // configurable paths
   var yeomanConfig = {
     app: 'app',
-    build: 'build'
+    build: 'app/build'
   };
 
   grunt.initConfig({
@@ -28,11 +28,6 @@ module.exports = function (grunt) {
       dev: {
         options: {
           port: 3000
-        }
-      },
-      prod: {
-        options: {
-          node_env: 'production'
         }
       }
     },
@@ -87,6 +82,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('build', [
+    'jshint',
     'handlebars',
     'requirejs'
   ]);

@@ -36,7 +36,6 @@ app.get('/api/stations', function (req, res) {
     citiClient = new Citibike();
   }
 
-  console.log('Update?: ', updateOnly);
   citiClient.getStations({ updateOnly: updateOnly }, function(data) {
     var stationList, updateTime;
 
