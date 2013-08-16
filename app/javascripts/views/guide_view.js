@@ -108,7 +108,7 @@ define([
     }, 250),
 
     onMapDrag: function () {
-      this.panToLatestMarker();
+      setTimeout(_.bind(this.panToLatestMarker, this), 200);
     },
 
     onStationSort: function (stations) {
