@@ -14,7 +14,10 @@ require.config({
       exports: 'Backbone'
     },
     handlebars: {
-      exports: "Handlebars"
+      exports: 'Handlebars'
+    },
+    compassjs: {
+      exports: 'Compass'
     }
   },
   paths: {
@@ -22,7 +25,8 @@ require.config({
     backbone: '../bower_components/backbone-amd/backbone',
     underscore: '../bower_components/underscore-amd/underscore',
     text: '../bower_components/requirejs-text/text',
-    handlebars: '../bower_components/handlebars/handlebars'
+    handlebars: '../bower_components/handlebars/handlebars',
+    compassjs: '../bower_components/compass-js/index'
   }
 });
 

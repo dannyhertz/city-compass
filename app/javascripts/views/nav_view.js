@@ -1,13 +1,16 @@
+/*global define*/
+'use strict';
+
 define([
   'jquery',
   'underscore',
   'backbone',
   'handlebars',
-  'text!../templates/header_view.hbs',
-], function($, _, Backbone, HandleBars, headerViewTemplate) {
+  'text!../templates/nav_view.hbs'
+], function($, _, Backbone, Handlebars, navViewTemplate) {
 
-  var HeaderView = Backbone.View.extend({
-    template: Handlebars.compile(headerViewTemplate),
+  var NavView = Backbone.View.extend({
+    template: Handlebars.compile(navViewTemplate),
 
     events: {
       'click .mode-link': 'onModeClick'
@@ -33,5 +36,5 @@ define([
     }
   });
 
-  return HeaderView;
+  return NavView;
 });

@@ -1,15 +1,11 @@
 <div class="target-info">
-  <div class="station-name">{{targetStation.stationName}}</div>
+  <div class="station-name">{{name}}</div>
   <div class="station-stats">
-    <div class="quanitity-stat stat">
-      {{#if isBikeMode}}
-        <strong>{{targetStation.estimatedBikeCount}}</strong> <small>bikes</small>
-      {{else}}
-        <strong>{{targetStation.estimatedDockCount}}</strong> <small>docks</small>
-      {{/if}}
+    <div class="quantity-stat stat">
+      <strong>{{quantity}}</strong> <small>{{mode}}</small>
     </div>
     <div class="distance-stat stat">
-      <strong>{{targetDistance}}</strong> <small>feet</small>
+      <strong>{{distance}}</strong> <small>{{units}}</small>
     </div>
   </div>
 </div>

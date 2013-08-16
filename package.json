@@ -4,7 +4,8 @@
   "dependencies": {
     "express": "3.2.3",
     "ejs": "*",
-    "restler": "*"
+    "restler": "*",
+    "citibike": "2.2.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -23,6 +24,7 @@
     "grunt-contrib-imagemin": "0.1.4",
     "grunt-contrib-watch": "~0.4.0",
     "grunt-contrib-jasmine": "~0.4.2",
+    "grunt-contrib-requirejs": "~0.4.1",
     "grunt-bower-requirejs": "~0.4.1",
     "grunt-usemin": "~0.1.10",
     "grunt-requirejs": "~0.3.5",

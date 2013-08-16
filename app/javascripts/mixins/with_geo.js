@@ -7,6 +7,10 @@ define([], function() {
     return deg * (Math.PI / 180);
   }
 
+  function radToDeg(rad) {
+    return rad * 180 / Math.PI;
+  }
+
   function distanceBetweenPoints(point1, point2) {
     var R = 6371 * 1000, // Radius of the earth in meters
         dLat, dLon, a, c;
@@ -21,28 +25,59 @@ define([], function() {
     return R * c;
   }
 
+  function bearingBetweenPoints(point1, point2) {
+    var dLon, y, x, brng;
+
+    dLon = (point2.longitude - point1.longitude);
+    y = Math.sin(dLon) * Math.cos(point2.latitude);
+    x = Math.cos(point1.latitude) * Math.sin(point2.latitude) -
+            Math.sin(point1.latitude) * Math.cos(point2.latitude) * Math.cos(dLon);
+    brng = radToDeg(Math.atan2(y, x));
+
+    return 360 - ((brng + 360) % 360);
+  }
+
   return {
     getCoordinates: function () {
-      return this.get('coordinates') || {
-        latitude: 0,
-        longitude: 0
+      return {
+        latitude: this.get('latitude'),
+        longitude: this.get('longitude')
       };
     },
 
     setCoordinates: function (coords) {
-      return this.set('coordinates', coords);
+      return this.set({
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      });
     },
 
-    distanceBetween: function (otherGeo, unit) {
-      var unit = unit === 'ft' ? 'ft' : 'm',
-          distance;
+    distanceBetween: function (otherGeo) {
+      var distance = distanceBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
+      return distance;
+    },
 
-      distance = distanceBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
-      if (unit === 'ft') {
-        distance *= 3.28084;
+    bearingBetween: function (otherGeo, northOffset) {
+      var bearing = bearingBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
+      return bearing + (northOffset || 0);
+    },
+
+    formatedDistanceBetween: function (otherGeo) {
+      var distanceInMeters = this.distanceBetween(otherGeo),
+          newDistance, newUnit;
+
+      if (distanceInMeters > 160) {
+        newDistance = distanceInMeters / 1609.34;
+        newUnit = 'miles';
+      } else {
+        newDistance = distanceInMeters * 3.28084;
+        newUnit = 'feet';
       }
 
-      return parseInt(distance, 10);
+      return {
+        distance: Math.round(newDistance * 10)/10,
+        unit: newUnit
+      };
     }
-  }
+  };
 });

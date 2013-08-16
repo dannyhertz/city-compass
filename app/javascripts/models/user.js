@@ -11,16 +11,12 @@ define([
 
   var User = Backbone.Model.extend({
     defaults: {
-      searchMode: 'bike',
-      pollTick: 0
+      searchMode: 'bike'
     },
 
-    initialize: function (attributes, options) {
-      if (!navigator) {
-        throw new Error('Geo API is not support.');
-      }
+    initialize: function () {
+      this.geoApi = window.navigator.geolocation;
 
-      this.geoApi = navigator.geolocation;
       this.targetStations = new Stations([], { user: this });
 
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
@@ -35,8 +31,8 @@ define([
       });
     },
 
-    getNearestStation: function () {
-      return this.targetStations.first();
+    getNearestStation: function (count) {
+      return this.targetStations.first(count);
     },
 
     getSearchMode: function () {
@@ -53,41 +49,67 @@ define([
       this.targetStations.sort();
     },
 
+    onStationsSort: function (stations) {
+      this.set('targetStation', stations.first());
+      this.trigger('targetstations:update', stations);
+    },
+
+    startGeoListening: function () {
+      this.startLocationPolling();
+      this.startStationPolling();
+    },
+
+    stopGeoListening: function () {
+      this.stopLocationPolling();
+      this.stopStationPolling();
+    },
+
     startLocationPolling: function () {
       this.trigger('locationpoll:start');
-      return this.pollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this));
+      this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this));
+
+      return this.locationPollingId;
     },
 
     stopLocationPolling: function () {
       this.trigger('locationpoll:stop');
-      this.geoApi.clearWatch(this.pollingId);
+      this.geoApi.clearWatch(this.locationPollingId);
+    },
+
+    startStationPolling: function () {
+      this.trigger('stationpoll:start');
+      this.stationPollingId = setInterval(_.bind(function () {
+        this.targetStations.fetch();
+      }, this), User.STATION_POLL_INTERVAL);
+
+      return this.stationPollingId;
+    },
+
+    stopStationPolling: function () {
+      this.trigger('stationpoll:stop');
+      clearInterval(this.stationPollingId);
     },
 
     onLocationPollingProgress: function (position) {
-      var newCoords = _.pick(position.coords, ['latitude', 'longitude']),
-          currentPollTick = this.get('pollTick');
+      var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
 
       this.setCoordinates(newCoords);
 
-      if (this.targetStations.isEmpty() || currentPollTick % User.POLL_TICK_SENSITIVITY === 0) {
+      if (this.targetStations.isEmpty()) {
         this.targetStations.fetch();
       } else {
         this.targetStations.sort();
       }
-      this.set('pollTick', currentPollTick + 1);
 
       this.trigger('locationpoll:progress', newCoords);
     },
 
     onLocationPollingError: function (err) {
+      console.log('Location polling error:', err);
       this.trigger('locationpoll:error', err);
-    },
-
-    onStationsSort: function (stations) {
-      this.trigger('targetstations:sort', stations);
     }
   }, {
-    POLL_TICK_SENSITIVITY: 2
+    STATION_POLL_INTERVAL: 7500
   });
   _.extend(User.prototype, WithGeo);
 

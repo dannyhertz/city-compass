@@ -4,10 +4,11 @@
 var express = require('express'),
     http = require('http'),
     path = require('path'),
-    rest = require('restler');
+    Citibike = require('citibike');
 
 // Create server
-var app = express();
+var app = express(),
+    citiClient;
 
 // Configure server
 app.set('port', process.env.PORT || 3000);
@@ -29,25 +30,29 @@ app.get('/', function (req, res) {
 });
 
 app.get('/api/stations', function (req, res) {
-  rest.get('https://citibikenyc.com/stations/json', {
-    parser: rest.parsers.json
-  }).on('complete', function(data) {
-    var stationList = data.stationBeanList,
-        updateTime = data.executionTime;
+  var updateOnly = req.query.update;
 
-    stationList.forEach(function (s) {
-      s.updatedAt = updateTime;
+  if (!citiClient) {
+    citiClient = new Citibike();
+  }
 
-      delete s.stAddress1;
-      delete s.stAddress2;
-      delete s.city;
-      delete s.postalCode;
-      delete s.location;
-      delete s.altitude;
-      delete s.lastCommunicationTime;
-    });
+  console.log('Update?: ', updateOnly);
+  citiClient.getStations({ updateOnly: updateOnly }, function(data) {
+    var stationList, updateTime;
 
-    res.json(stationList);
+    if (!data.ok || data.ok === false) {
+      res.json(null);
+    } else {
+      updateTime = data.lastUpdate;
+      stationList = data.results;
+
+      stationList = stationList.map(function (st) {
+        st.updatedAt = updateTime;
+        return st;
+      });
+
+      res.json(stationList);
+    }
   });
 });
 

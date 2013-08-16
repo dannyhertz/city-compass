@@ -10,7 +10,9 @@ define([
 
   var Stations = Backbone.Collection.extend({
     model: Station,
-    url: '/api/stations',
+    url: function () {
+      return '/api/stations?update=' + !this.isEmpty();
+    },
 
     initialize: function (attrs, opts) {
       if (!opts.user) {
