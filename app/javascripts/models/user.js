@@ -109,7 +109,7 @@ define([
       this.trigger('locationpoll:error', err);
     }
   }, {
-    STATION_POLL_INTERVAL: 7500
+    STATION_POLL_INTERVAL: 10000
   });
   _.extend(User.prototype, WithGeo);
 

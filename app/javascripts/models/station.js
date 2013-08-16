@@ -59,7 +59,7 @@ define([
       var refreshTime = new Date(this.get('updatedAt') * 1000),
           currentTime = new Date();
 
-      return Math.min(currentTime.getMinutes() - refreshTime.getMinutes() + 1, Station.MAX_PADDING);
+      return Math.round(Math.min(((currentTime.getMinutes() - refreshTime.getMinutes()) / 2), Station.MAX_PADDING));
     }
   },
   {

@@ -18,6 +18,7 @@ define([
       window.user = this.currentUser;
 
       this.listenTo(this.currentUser, 'targetstations:update', this.updateCurrentStation);
+      this.listenTo(this.currentUser, 'change:searchMode', this.updateCurrentStation);
     },
 
     render: function () {
@@ -27,13 +28,13 @@ define([
       templateData = nearestStation ? this.getDashData(this.currentUser, nearestStation) : {};
       this.$el.html(this.template(templateData));
 
-      this.$stationName = this.$('.station-name:first');
+      this.$targetAddress = this.$('.target-address:first');
 
-      this.$targetCount = this.$('.quantity-stat strong:first');
-      this.$targetMode = this.$('.quantity-stat small:first');
+      this.$targetQuantity = this.$('.target-quantity:first');
+      this.$targetType = this.$('.target-type:first');
 
-      this.$targetDistance = this.$('.distance-stat strong:first');
-      this.$targetUnits = this.$('.distance-stat small:first');
+      this.$targetRange = this.$('.target-range:first');
+      this.$targetUnit = this.$('.target-unit:first');
 
       return this;
     },
@@ -41,17 +42,13 @@ define([
     updateDashStation: function (user, station) {
       var dashData = this.getDashData(user, station);
 
-      console.log('updating the station bitch', dashData);
+      this.$targetAddress.text(dashData.name);
 
-      this.$stationName.text(dashData.name);
+      this.$targetQuantity.text(dashData.quantity);
+      this.$targetType.text(dashData.mode + 's');
 
-      //this.$targetCount.text(dashData.quantity);
-      //console.log('animating', this.$targetCount, ' to ', dashData.quantity);
-      this.animateNumberElem(this.$targetCount, dashData.quantity);
-      this.$targetMode.text(dashData.mode + 's');
-
-      this.$targetDistance.text(dashData.distance);
-      this.$targetUnits.text(dashData.units);
+      this.$targetRange.text(dashData.distance);
+      this.$targetUnit.text(dashData.units);
     },
 
     updateCurrentStation: function () {

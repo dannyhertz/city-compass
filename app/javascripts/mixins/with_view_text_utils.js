@@ -11,7 +11,7 @@ define([
     elem.textContent = newNum;
 
     if (newNum < targetNum) {
-      setTimeout(_.bind(increment, null, elem, newNum, targetNum), 20);
+      setTimeout(_.bind(increment, null, elem, newNum, targetNum), 15);
     }
   }
   function decrement(elem, currentNum, targetNum) {
@@ -19,7 +19,7 @@ define([
     elem.textContent = newNum;
 
     if (newNum > targetNum) {
-      setTimeout(_.bind(decrement, null, elem, newNum, targetNum), 20);
+      setTimeout(_.bind(decrement, null, elem, newNum, targetNum), 15);
     }
   }
 

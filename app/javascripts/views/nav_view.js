@@ -13,7 +13,7 @@ define([
     template: Handlebars.compile(navViewTemplate),
 
     events: {
-      'click .mode-link': 'onModeClick'
+      'click .mode-btn': 'onModeClick'
     },
 
     initialize: function (opts) {
@@ -32,7 +32,9 @@ define([
 
     onModeClick: function (e) {
       e.preventDefault();
-      this.currentUser.toggleSearchMode();
+
+      var targetMode = $(e.currentTarget).data('type');
+      this.currentUser.setSearchMode(targetMode);
     }
   });
 

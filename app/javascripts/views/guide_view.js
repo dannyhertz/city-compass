@@ -104,7 +104,6 @@ define([
     },
 
     onMapResize: _.debounce(function () {
-      console.log('resize!');
       this.panToLatestMarker();
     }, 250),
 
@@ -114,7 +113,6 @@ define([
 
     onStationSort: function (stations) {
       var nearestStation = this.currentUser.getNearestStation();
-      console.log(nearestStation);
       this.panToStationAndMark(nearestStation, true);
     }
   });

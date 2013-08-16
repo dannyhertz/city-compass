@@ -64,18 +64,20 @@ define([], function() {
 
     formatedDistanceBetween: function (otherGeo) {
       var distanceInMeters = this.distanceBetween(otherGeo),
-          newDistance, newUnit;
+          newDistance, newUnit, newRoundedDistance;
 
       if (distanceInMeters > 160) {
         newDistance = distanceInMeters / 1609.34;
-        newUnit = 'miles';
+        newRoundedDistance = Math.round(newDistance * 10)/10,
+        newUnit = 'mi';
       } else {
         newDistance = distanceInMeters * 3.28084;
-        newUnit = 'feet';
+        newRoundedDistance = Math.round(newDistance);
+        newUnit = 'ft';
       }
 
       return {
-        distance: Math.round(newDistance * 10)/10,
+        distance: newRoundedDistance,
         unit: newUnit
       };
     }
