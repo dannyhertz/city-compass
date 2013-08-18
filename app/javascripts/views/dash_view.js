@@ -17,7 +17,7 @@ define([
       this.currentUser = opts.user;
       window.user = this.currentUser;
 
-      this.listenTo(this.currentUser, 'targetstations:update', this.updateCurrentStation);
+      this.listenTo(this.currentUser, 'targetstation:new targetstation:update', this.updateCurrentStation);
       this.listenTo(this.currentUser, 'change:searchMode', this.updateCurrentStation);
     },
 

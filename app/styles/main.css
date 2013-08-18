@@ -14,7 +14,7 @@ html, body {
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.428571429;
+  line-height: 1.4;
 }
 
 .inset-shadow-top, .inset-shadow-bottom {
@@ -39,6 +39,53 @@ body {
 .view {
   height: 100%;
 }
+
+.loading .app-loader {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity .5s ease-out;
+  transition: opacity .5s ease-out;
+}
+.app-loader {
+  z-index: 100;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: #FEFEFE;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: .5s;
+  transition: .5s;
+
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+}
+.app-loader .wheel {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-box-pack: center;
+  -webkit-align-items: center;
+  -webkit-animation: spin 2000ms infinite;
+}
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+
 
 .content-view {
   position: relative;
@@ -68,6 +115,8 @@ header {
   position: relative;
   display: inline-block;
   padding: 6px 12px;
+  font-size: 1.2em;
+  line-height: 1.5;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
@@ -77,6 +126,7 @@ header {
   background-color: #428bca;
   border-color: #357ebd;
   text-decoration: none;
+  -webkit-font-smoothing:antialiased;
 }
 .mode-toggle a:first-child {
   border-top-right-radius: 0;
@@ -108,11 +158,48 @@ header {
   width: 100%;
 }
 
+.map-marker {
+  font-size: 18px !important;
+}
+.map-marker > .marker-blip {
+  position: relative;
+  display: block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  box-shadow:
+    0 1px 6px rgba(0,0,0,0.3),
+    0 0 2px rgba(0,0,0,0.2) inset;
+  background: #1e69de;
+  background-position: -1px -1px
+}
+.map-marker > .marker-ring {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0.2em 0.12em #2C73DD;
+  -webkit-animation: blip 1500ms infinite;
+}
+@-webkit-keyframes blip {
+  0% {
+    -webkit-transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
 footer {
   z-index: 2;
   position: absolute;
   bottom: 0;
   width: 100%;
+  min-height: 8em;
   padding: 10px 12px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.9);

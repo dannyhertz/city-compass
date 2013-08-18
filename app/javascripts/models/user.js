@@ -50,8 +50,15 @@ define([
     },
 
     onStationsSort: function (stations) {
-      this.set('targetStation', stations.first());
-      this.trigger('targetstations:update', stations);
+      var nearestStation = stations.first(),
+          currentTarget = this.get('targetStation');
+
+      if (nearestStation !== currentTarget) {
+        this.set('targetStation', stations.first());
+        this.trigger('targetstation:new', stations);
+      } else {
+        this.trigger('targetstation:update', stations);
+      }
     },
 
     startGeoListening: function () {
@@ -66,7 +73,15 @@ define([
 
     startLocationPolling: function () {
       this.trigger('locationpoll:start');
-      this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this));
+
+      // Get initial position
+      this.geoApi.getCurrentPosition(_.bind(function (position) {
+        this.onLocationPollingProgress(position);
+        this.trigger('locationpoll:progress', newCoords);
+
+        // Start location polling
+        this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this));
+      }, this), _.bind(this.onLocationPollingError, this));
 
       return this.locationPollingId;
     },
@@ -78,6 +93,8 @@ define([
 
     startStationPolling: function () {
       this.trigger('stationpoll:start');
+
+      this.targetStations.fetch();
       this.stationPollingId = setInterval(_.bind(function () {
         this.targetStations.fetch();
       }, this), User.STATION_POLL_INTERVAL);
@@ -94,10 +111,7 @@ define([
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
 
       this.setCoordinates(newCoords);
-
-      if (this.targetStations.isEmpty()) {
-        this.targetStations.fetch();
-      } else {
+      if (!this.targetStations.isEmpty()) {
         this.targetStations.sort();
       }
 
@@ -109,7 +123,7 @@ define([
       this.trigger('locationpoll:error', err);
     }
   }, {
-    STATION_POLL_INTERVAL: 10000
+    STATION_POLL_INTERVAL: 20000
   });
   _.extend(User.prototype, WithGeo);
 

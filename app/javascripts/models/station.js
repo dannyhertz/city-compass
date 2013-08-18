@@ -57,13 +57,14 @@ define([
 
     confidencePadding: function () {
       var refreshTime = new Date(this.get('updatedAt') * 1000),
-          currentTime = new Date();
+          currentTime = new Date(),
+          minDifference = currentTime.getMinutes() - refreshTime.getMinutes();
 
-      return Math.round(Math.min(((currentTime.getMinutes() - refreshTime.getMinutes()) / 2), Station.MAX_PADDING));
+      return minDifference > 3 ? 1 : 0;
     }
   },
   {
-    MAX_PADDING: 3
+    MAX_PADDING: 2
   });
   _.extend(Station.prototype, WithGeo);
 

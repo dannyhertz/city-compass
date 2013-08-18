@@ -16,8 +16,8 @@ require.config({
     handlebars: {
       exports: 'Handlebars'
     },
-    compassjs: {
-      exports: 'Compass'
+    richmarker: {
+      exports: 'RichMarker'
     }
   },
   paths: {
@@ -26,7 +26,7 @@ require.config({
     underscore: '../bower_components/underscore-amd/underscore',
     text: '../bower_components/requirejs-text/text',
     handlebars: '../bower_components/handlebars/handlebars',
-    compassjs: '../bower_components/compass-js/index'
+    richmarker: '../bower_components/richmarker/richmarker'
   }
 });
 
@@ -38,7 +38,9 @@ require([
 
   var $mainContainer, appView;
 
-  $mainContainer = $('#main-view');
-  appView = new AppView({ el: $mainContainer }).render();
+  $(function () {
+    $mainContainer = $('#main-view');
+    appView = new AppView({ el: $mainContainer }).render();
+  });
 
 });

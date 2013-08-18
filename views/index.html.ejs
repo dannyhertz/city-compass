@@ -6,17 +6,18 @@
   <title></title>
   <meta name="description" content="">
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="CityCompass">
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <link rel="stylesheet" href="styles/main.css">
   <script src="bower_components/modernizr/modernizr.js"></script>
 </head>
-<body>
+<body class="loading">
+  <section class="app-loader"><img class="wheel" src="images/wheel.png"></section>
   <section id="main-view" class="view"></section>
-  <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzL_SpetSlnwSRsfZ2jWd4B2PY7Tc4d8k&sensor=true">
-    </script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzL_SpetSlnwSRsfZ2jWd4B2PY7Tc4d8k&sensor=true"></script>
   <script data-main="javascripts/main" src="bower_components/requirejs/require.js"></script>
 </body>
 </html>

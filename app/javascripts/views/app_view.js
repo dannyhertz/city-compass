@@ -18,6 +18,11 @@ define([
 
     initialize: function () {
       this.currentUser = new User();
+
+      this.listenToOnce(this.currentUser, 'locationpoll:progress', function () {
+        $('body').removeClass('loading');
+      });
+
       this.currentUser.startGeoListening();
     },
 

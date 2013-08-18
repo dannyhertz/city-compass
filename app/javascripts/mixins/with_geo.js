@@ -38,6 +38,11 @@ define([], function() {
   }
 
   return {
+    hasCoordinates: function () {
+      return this.get('latitude') !== undefined &&
+             this.get('longitude') !== undefined;
+    },
+
     getCoordinates: function () {
       return {
         latitude: this.get('latitude'),
@@ -46,10 +51,13 @@ define([], function() {
     },
 
     setCoordinates: function (coords) {
-      return this.set({
+      var newCoords = this.set({
         latitude: coords.latitude,
         longitude: coords.longitude
       });
+      this.trigger('change:coordinates', this, coords);
+
+      return newCoords;
     },
 
     distanceBetween: function (otherGeo) {

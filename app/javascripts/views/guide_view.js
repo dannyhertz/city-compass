@@ -6,29 +6,40 @@ define([
   'underscore',
   'backbone',
   'handlebars',
-  'text!../templates/guide_view.hbs'
-], function($, _, Backbone, Handlebars, guideViewTemplate) {
+  'richmarker',
+  'text!../templates/guide_view.hbs',
+  'text!../templates/map_marker.hbs'
+], function($, _, Backbone, Handlebars, RichMarker, guideViewTemplate, markerTemplate) {
 
   var GuideView = Backbone.View.extend({
     template: Handlebars.compile(guideViewTemplate),
+    markerTemplate: Handlebars.compile(markerTemplate),
 
-    mapOptions: {
+    markerTypes: {
+      google: google.maps.Marker,
+      custom: RichMarker
+    },
+
+    mapDefaultOptions: {
       center: new google.maps.LatLng(-34.397, 150.644),
-      zoom: 16,
+      zoom: 17,
       disableDefaultUI: true,
       panControl: false,
       zoomControl: false,
+      scrollwheel: false,
       scaleControl: false,
       streetViewControl: false,
       disableDoubleClickZoom: true,
       overviewMapControl: false,
+      draggable: false,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     },
 
     initialize: function (opts) {
       this.currentUser = opts.user;
 
-      this.listenTo(this.currentUser, 'targetstations:update', this.onStationSort);
+      this.listenTo(this.currentUser, 'targetstation:new', this.onNewTargetStation);
+      this.listenTo(this.currentUser, 'change:coordinates', this.onUserLocationChange);
     },
 
     render: function () {
@@ -56,12 +67,11 @@ define([
 
     renderMap: function ($mapEl) {
       google.maps.visualRefresh = true;
-      this.map = new google.maps.Map($mapEl[0], this.mapOptions);
+      this.map = new google.maps.Map($mapEl[0], this.mapDefaultOptions);
     },
 
     attachMapEvents: function () {
       if (this.map) {
-        google.maps.event.addListener(this.map, 'dragend', _.bind(this.onMapDrag, this));
         $(window).on('resize', _.bind(this.onMapResize, this));
       }
     },
@@ -77,43 +87,100 @@ define([
       }
     },
 
-    panToStationAndMark: function (station, replaceMark) {
-      var stationCoords = station.getCoordinates(),
-          stationMapCoords = new google.maps.LatLng(stationCoords.latitude, stationCoords.longitude);
+    renderMarker: function (type) {
+      return this.markerTemplate({ type: type || 'self' });
+    },
 
-      if (this.latestMarker && stationMapCoords.equals(this.latestMarker.getPosition())) {
-        return;
-      }
+    normalizeMapCoords: function (coords) {
+      var mapCoords = coords instanceof google.maps.LatLng ? coords :
+        new google.maps.LatLng(coords.latitude, coords.longitude);
+      return mapCoords;
+    },
 
-      if (replaceMark && this.latestMarker) {
-        this.latestMarker.setMap(null);
-      }
+    createMarker: function (coords, animation, type, subType) {
+      var markerType = this.markerTypes[type] || this.markerTypes['google'];
 
-      this.map.panTo(stationMapCoords);
-      this.latestMarker = new google.maps.Marker({
+      return new markerType({
         map: this.map,
-        position: stationMapCoords,
-        animation: google.maps.Animation.DROP
+        position: this.normalizeMapCoords(coords),
+        draggable: false,
+        content: this.renderMarker(subType || 'self'),
+        animation: animation ? google.maps.Animation.DROP : null,
       });
     },
 
-    panToLatestMarker: function () {
-      if (this.map && this.latestMarker) {
-        this.map.panTo(this.latestMarker.getPosition());
+    setUserMarker: function (mapCoords) {
+      mapCoords = this.normalizeMapCoords(mapCoords);
+
+      if (this.userMarker) {
+        this.moveMarker(this.userMarker, mapCoords);
+      } else {
+        this.userMarker = this.createMarker(mapCoords, true, 'custom', 'self');
+      }
+    },
+
+    setTargetMarker: function (mapCoords) {
+      mapCoords = this.normalizeMapCoords(mapCoords);
+
+      if (this.targetMarker) {
+        this.moveMarker(this.targetMarker, mapCoords);
+      } else {
+        this.targetMarker = this.createMarker(mapCoords, true, 'google');
+      }
+    },
+
+    moveMarker: function (marker, mapCoords) {
+      marker.setPosition(this.normalizeMapCoords(mapCoords));
+    },
+
+    getFittedBounds: function (points) {
+      var bounds = new google.maps.LatLngBounds();
+
+      points.forEach(function (p) {
+        bounds.extend(new google.maps.LatLng(p.latitude, p.longitude));
+      });
+
+      return bounds;
+    },
+
+    fitUserAndTargetStation: function () {
+      if (this.currentUser && this.currentUser.hasCoordinates() && this.nearestStation && this.nearestStation.hasCoordinates()) {
+        var fittedBounds = this.getFittedBounds([
+          this.currentUser.getCoordinates(),
+          this.nearestStation.getCoordinates()
+        ]);
+
+        this.map.fitBounds(fittedBounds);
       }
     },
 
     onMapResize: _.debounce(function () {
-      this.panToLatestMarker();
+      this.fitUserAndTargetStation();
     }, 250),
 
-    onMapDrag: function () {
-      setTimeout(_.bind(this.panToLatestMarker, this), 200);
+    onNewTargetStation: function (stations) {
+      this.nearestStation = this.currentUser.getNearestStation();
+      this.setTargetMarker(this.nearestStation.getCoordinates());
+
+      // Update dem bounds!
+      this.fitUserAndTargetStation();
     },
 
-    onStationSort: function (stations) {
-      var nearestStation = this.currentUser.getNearestStation();
-      this.panToStationAndMark(nearestStation, true);
+    onUserLocationChange: function (user, coords) {
+      var currentMapCoords;
+
+      // Convert coords to google coords
+      if (coords instanceof google.maps.LatLng) {
+        currentMapCoords = coords;
+      } else {
+        currentMapCoords = new google.maps.LatLng(coords.latitude, coords.longitude);
+      }
+
+      // Move the users current location
+      this.setUserMarker(coords);
+
+      // Update dem bounds!
+      this.fitUserAndTargetStation();
     }
   });
 
