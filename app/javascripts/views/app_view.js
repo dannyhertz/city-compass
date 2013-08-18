@@ -19,7 +19,7 @@ define([
     initialize: function () {
       this.currentUser = new User({}, { seedStations: SEEDS.stations });
 
-      this.listenToOnce(this.currentUser, 'locationpoll:progress', function () {
+      this.listenToOnce(this.currentUser, 'ready', function () {
         $('body').removeClass('loading');
       });
 

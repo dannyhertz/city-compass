@@ -61,7 +61,12 @@ define([], function() {
     },
 
     distanceBetween: function (otherGeo) {
-      var distance = distanceBetweenPoints(this.getCoordinates(), otherGeo.getCoordinates());
+      var otherCoordinates = otherGeo;
+      if (typeof otherGeo.getCoordinates === 'function') {
+        otherCoordinates = otherGeo.getCoordinates();
+      }
+
+      var distance = distanceBetweenPoints(this.getCoordinates(), otherCoordinates);
       return distance;
     },
 

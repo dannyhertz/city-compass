@@ -18,6 +18,10 @@ define([
       maximumAge : 10000,
       timeout : 10000
     },
+    initializedServices: {
+      user: false,
+      stations: false
+    },
 
     initialize: function (attrs, opts) {
       var seedStations = (opts || {}).seedStations || [];
@@ -62,6 +66,27 @@ define([
       this.set('searchMode', targetMode);
     },
 
+    setInitializeFlag: function (service) {
+      var allDone = false;
+
+      this.initializedServices[service] = true;
+      allDone = _.every(this.initializedServices, function (service) {
+        return !!service;
+      });
+
+      if (allDone) {
+        this.trigger('ready');
+        this.setInitializeFlag = function () {}; //set noop
+      }
+    },
+
+    getCurrentLocation: function () {
+      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
+          boundError = _.bind(this.onCurrentPositionError, this);
+
+      this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
+    },
+
     onStationsSort: function (stations) {
       var nearestStation = stations.first(),
           currentTarget = this.get('targetStation');
@@ -72,6 +97,8 @@ define([
       } else {
         this.trigger('targetstation:update', stations);
       }
+
+      this.setInitializeFlag('stations');
     },
 
     startGeoListening: function () {
@@ -87,14 +114,10 @@ define([
     startLocationPolling: function () {
       this.trigger('locationpoll:start');
 
-      // Get initial position
-      // this.geoApi.getCurrentPosition(_.bind(function (position) {
-      //   this.onLocationPollingProgress(position);
-      //   this.trigger('locationpoll:progress', position);
-
-        // Start location polling
-      this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this), null, this.geoOptions);
-      // }, this), _.bind(this.onLocationPollingError, this), this.geoOptions);
+      this.getCurrentLocation();
+      this.locationPollingId = setInterval(_.bind(function () {
+        this.getCurrentLocation();
+      }, this), User.USER_POLL_INTERVAL);
 
       return this.locationPollingId;
     },
@@ -120,22 +143,24 @@ define([
       clearInterval(this.stationPollingId);
     },
 
-    onLocationPollingProgress: function (position) {
+    onCurrentPositionSuccess: function (position) {
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
 
       this.setCoordinates(newCoords);
-      if (!this.targetStations.isEmpty()) {
+      this.setInitializeFlag('user');
+      if (!this.targetStations.isEmpty() && this.distanceBetween(newCoords > 25)) {
         this.sortStations();
       }
 
       this.trigger('locationpoll:progress', newCoords);
     },
 
-    onLocationPollingError: function (err) {
+    onCurrentPositionError: function (err) {
       this.trigger('locationpoll:error', err);
     }
   }, {
-    STATION_POLL_INTERVAL: 15000
+    STATION_POLL_INTERVAL: 15000,
+    USER_POLL_INTERVAL: 5000
   });
   _.extend(User.prototype, WithGeo);
 
