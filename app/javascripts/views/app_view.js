@@ -1,4 +1,4 @@
-/*global define*/
+/*global define, SEEDS */
 'use strict';
 
 define([
@@ -17,7 +17,7 @@ define([
     template: Handlebars.compile(mainViewTemplate),
 
     initialize: function () {
-      this.currentUser = new User();
+      this.currentUser = new User({}, { seedStations: SEEDS.stations });
 
       this.listenToOnce(this.currentUser, 'locationpoll:progress', function () {
         $('body').removeClass('loading');

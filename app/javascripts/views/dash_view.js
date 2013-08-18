@@ -44,7 +44,8 @@ define([
 
       this.$targetAddress.text(dashData.name);
 
-      this.$targetQuantity.text(dashData.quantity);
+      //this.$targetQuantity.text(dashData.quantity);
+      this.animateNumberElem(this.$targetQuantity, dashData.quantity);
       this.$targetType.text(dashData.mode + 's');
 
       this.$targetRange.text(dashData.distance);

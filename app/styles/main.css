@@ -75,7 +75,7 @@ body {
   justify-content: center;
   -webkit-box-pack: center;
   -webkit-align-items: center;
-  -webkit-animation: spin 2000ms infinite;
+  -webkit-animation: spin 1800ms infinite;
 }
 @-webkit-keyframes spin {
   from { -webkit-transform: rotate(0deg); }
@@ -123,7 +123,7 @@ header {
   border-radius: 4px;
   border: 1px solid transparent;
   color: #ffffff;
-  background-color: #428bca;
+  background-color: rgba(66, 139, 202, .9);
   border-color: #357ebd;
   text-decoration: none;
   -webkit-font-smoothing:antialiased;
@@ -140,7 +140,7 @@ header {
 .mode-toggle a:active, .mode-toggle a.active,
 .mode-toggle.bike-mode .bike-btn, .mode-toggle.dock-mode .dock-btn {
   z-index: 5;
-  background-color: #3276b1;
+  background-color: rgba(50, 118, 177, .9);
   border-color: #285e8e;
   outline: 0;
   -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
@@ -171,7 +171,7 @@ header {
     0 1px 6px rgba(0,0,0,0.3),
     0 0 2px rgba(0,0,0,0.2) inset;
   background: #1e69de;
-  background-position: -1px -1px
+  background-position: -1px -1px;
 }
 .map-marker > .marker-ring {
   position: absolute;
@@ -179,8 +179,7 @@ header {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  box-shadow:
-    0 0 0.2em 0.12em #2C73DD;
+  box-shadow: 0 0 0.2em 0.12em #2C73DD;
   -webkit-animation: blip 1500ms infinite;
 }
 @-webkit-keyframes blip {
@@ -192,6 +191,37 @@ header {
     -webkit-transform: scale(2.6);
     opacity: 0;
   }
+}
+@-webkit-keyframes small_blip {
+  0% {
+    -webkit-transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.map-marker.station {
+  font-size: 9px !important;
+}
+.map-marker.station > .marker-blip {
+  background: #F75850;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3), 0 0 2px rgba(0,0,0,0.2) inset;
+}
+.map-marker.station > .marker-ring {
+  display: none;
+  -webkit-animation: none;
+}
+
+.map-marker.target-station > .marker-blip {
+  font-size: 18px !important;
+}
+.map-marker.target-station > .marker-ring {
+  display: block;
+  box-shadow: 0 0 0.2em 0.12em #EB1C24;
+  -webkit-animation: small_blip 2500ms infinite;
 }
 
 footer {

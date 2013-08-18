@@ -31,7 +31,6 @@ define([
       streetViewControl: false,
       disableDoubleClickZoom: true,
       overviewMapControl: false,
-      draggable: false,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     },
 
@@ -55,6 +54,8 @@ define([
       this.$mapHolder = this.$('.map-holder');
 
       this.renderMap(this.$mapHolder);
+      this.renderAllStations();
+
       this.attachMapEvents();
 
       return this;
@@ -68,6 +69,26 @@ define([
     renderMap: function ($mapEl) {
       google.maps.visualRefresh = true;
       this.map = new google.maps.Map($mapEl[0], this.mapDefaultOptions);
+    },
+
+    renderMarker: function (type) {
+      return this.markerTemplate({ type: type || 'self' });
+    },
+
+    renderAllStations: function () {
+      var allStations = this.currentUser.targetStations,
+          targetStation = this.currentUser.getNearestStation();
+
+      allStations.forEach(function (station) {
+        if (station !== targetStation) {
+          this.createMarker({
+            coords: station.getCoordinates(),
+            animation: false,
+            type: 'custom',
+            subType: 'station'
+          });
+        }
+      }, this);
     },
 
     attachMapEvents: function () {
@@ -87,26 +108,25 @@ define([
       }
     },
 
-    renderMarker: function (type) {
-      return this.markerTemplate({ type: type || 'self' });
-    },
-
     normalizeMapCoords: function (coords) {
       var mapCoords = coords instanceof google.maps.LatLng ? coords :
         new google.maps.LatLng(coords.latitude, coords.longitude);
       return mapCoords;
     },
 
-    createMarker: function (coords, animation, type, subType) {
-      var markerType = this.markerTypes[type] || this.markerTypes['google'];
+    createMarker: function (options) {
+      options = (options || {});
 
-      return new markerType({
+      var markerType = this.markerTypes[options.type] || this.markerTypes['google'];
+
+      return new markerType(_.extend({}, {
         map: this.map,
-        position: this.normalizeMapCoords(coords),
+        position: this.normalizeMapCoords(options.coords),
         draggable: false,
-        content: this.renderMarker(subType || 'self'),
-        animation: animation ? google.maps.Animation.DROP : null,
-      });
+        content: this.renderMarker(options.subType || 'self'),
+        animation: options.animation ? google.maps.Animation.DROP : null,
+        zIndex: 1
+      }, options));
     },
 
     setUserMarker: function (mapCoords) {
@@ -115,7 +135,12 @@ define([
       if (this.userMarker) {
         this.moveMarker(this.userMarker, mapCoords);
       } else {
-        this.userMarker = this.createMarker(mapCoords, true, 'custom', 'self');
+        this.userMarker = this.createMarker({
+          coords: mapCoords,
+          animation: false,
+          type: 'custom',
+          subType: 'self'
+        });
       }
     },
 
@@ -125,7 +150,12 @@ define([
       if (this.targetMarker) {
         this.moveMarker(this.targetMarker, mapCoords);
       } else {
-        this.targetMarker = this.createMarker(mapCoords, true, 'google');
+        this.targetMarker = this.createMarker({
+          coords: mapCoords,
+          animation: true,
+          type: 'custom',
+          subType: 'target-station station'
+        });
       }
     },
 
@@ -151,6 +181,9 @@ define([
         ]);
 
         this.map.fitBounds(fittedBounds);
+
+        // For now zoom out a bit so avoid overlapping
+        this.map.setZoom(this.map.getZoom() - 1);
       }
     },
 

@@ -25,8 +25,11 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+// Seed data
+var seedStations = require('./seeds/stations.json');
+
 app.get('/', function (req, res) {
-  res.render('index.html.ejs');
+  res.render('index.html.ejs', { seedStations: seedStations });
 });
 
 app.get('/api/stations', function (req, res) {

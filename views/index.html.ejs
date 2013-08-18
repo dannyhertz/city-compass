@@ -17,6 +17,10 @@
   <section class="app-loader"><img class="wheel" src="images/wheel.png"></section>
   <section id="main-view" class="view"></section>
 
+  <script>
+    var SEEDS = {};
+    SEEDS.stations = <%- JSON.stringify(seedStations) %>;
+  </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzL_SpetSlnwSRsfZ2jWd4B2PY7Tc4d8k&sensor=true"></script>
   <script data-main="javascripts/main" src="bower_components/requirejs/require.js"></script>
 </body>

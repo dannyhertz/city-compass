@@ -13,13 +13,20 @@ define([
     defaults: {
       searchMode: 'bike'
     },
+    geoOptions: {
+      enableHighAccuracy: true,
+      maximumAge : 10000,
+      timeout : 10000
+    },
 
-    initialize: function () {
+    initialize: function (attrs, opts) {
+      var seedStations = (opts || {}).seedStations || [];
+
       this.geoApi = window.navigator.geolocation;
-
-      this.targetStations = new Stations([], { user: this });
+      this.targetStations = new Stations(seedStations, { user: this });
 
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
+      this.listenTo(this, 'change:searchMode', this.sortStations);
     },
 
     toJSON: function () {
@@ -29,6 +36,13 @@ define([
       return $.extend({}, attrs, {
         nearestStation: nearestStation && nearestStation.toJSON()
       });
+    },
+
+    sortStations: function () {
+      // defer to make things more responsive
+      _.defer(_.bind(function () {
+        this.targetStations.sort();
+      }, this));
     },
 
     getNearestStation: function (count) {
@@ -46,7 +60,7 @@ define([
     toggleSearchMode: function () {
       var targetMode = { bike: 'dock', dock: 'bike' }[this.get('searchMode')];
       this.set('searchMode', targetMode);
-      this.targetStations.sort();
+      this.sortStations();
     },
 
     onStationsSort: function (stations) {
@@ -77,11 +91,11 @@ define([
       // Get initial position
       this.geoApi.getCurrentPosition(_.bind(function (position) {
         this.onLocationPollingProgress(position);
-        this.trigger('locationpoll:progress', newCoords);
+        this.trigger('locationpoll:progress', position);
 
         // Start location polling
-        this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this));
-      }, this), _.bind(this.onLocationPollingError, this));
+        this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this), null, this.geoOptions);
+      }, this), _.bind(this.onLocationPollingError, this), this.geoOptions);
 
       return this.locationPollingId;
     },
@@ -119,11 +133,10 @@ define([
     },
 
     onLocationPollingError: function (err) {
-      console.log('Location polling error:', err);
       this.trigger('locationpoll:error', err);
     }
   }, {
-    STATION_POLL_INTERVAL: 20000
+    STATION_POLL_INTERVAL: 15000
   });
   _.extend(User.prototype, WithGeo);
 
