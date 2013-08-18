@@ -23,6 +23,8 @@ define([
         $('body').removeClass('loading');
       });
 
+      this.listenTo(this.currentUser, 'all', this.updateDebugInfo);
+
       this.currentUser.startGeoListening();
     },
 
@@ -34,6 +36,10 @@ define([
       this.dashView = new DashView({ user: this.currentUser, el: this.$('.dash-view') }).render();
 
       return this;
+    },
+
+    updateDebugInfo: function (text) {
+      $('.debug-holder').text(Math.round(+new Date()/1000) + ' - ' + text);
     }
   });
 

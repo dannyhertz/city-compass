@@ -44,7 +44,6 @@ define([
 
       this.$targetAddress.text(dashData.name);
 
-      //this.animateNumberElem(this.$targetQuantity, dashData.quantity);
       this.$targetQuantity.text(dashData.quantity);
       this.$targetType.text(dashData.mode + 's');
 

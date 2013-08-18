@@ -31,6 +31,7 @@ define([
       streetViewControl: false,
       disableDoubleClickZoom: true,
       overviewMapControl: false,
+      draggable: false,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     },
 
@@ -117,9 +118,9 @@ define([
     createMarker: function (options) {
       options = (options || {});
 
-      var markerType = this.markerTypes[options.type] || this.markerTypes['google'];
+      var MarkerType = this.markerTypes[options.type] || this.markerTypes.google;
 
-      return new markerType(_.extend({}, {
+      return new MarkerType(_.extend({}, {
         map: this.map,
         position: this.normalizeMapCoords(options.coords),
         draggable: false,
@@ -179,6 +180,8 @@ define([
           this.currentUser.getCoordinates(),
           this.nearestStation.getCoordinates()
         ]);
+
+        this.currentUser.trigger('fittingmap');
 
         this.map.fitBounds(fittedBounds);
 

@@ -60,7 +60,6 @@ define([
     toggleSearchMode: function () {
       var targetMode = { bike: 'dock', dock: 'bike' }[this.get('searchMode')];
       this.set('searchMode', targetMode);
-      this.sortStations();
     },
 
     onStationsSort: function (stations) {
@@ -89,13 +88,13 @@ define([
       this.trigger('locationpoll:start');
 
       // Get initial position
-      this.geoApi.getCurrentPosition(_.bind(function (position) {
-        this.onLocationPollingProgress(position);
-        this.trigger('locationpoll:progress', position);
+      // this.geoApi.getCurrentPosition(_.bind(function (position) {
+      //   this.onLocationPollingProgress(position);
+      //   this.trigger('locationpoll:progress', position);
 
         // Start location polling
-        this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this), null, this.geoOptions);
-      }, this), _.bind(this.onLocationPollingError, this), this.geoOptions);
+      this.locationPollingId = this.geoApi.watchPosition(_.bind(this.onLocationPollingProgress, this), null, this.geoOptions);
+      // }, this), _.bind(this.onLocationPollingError, this), this.geoOptions);
 
       return this.locationPollingId;
     },
@@ -126,7 +125,7 @@ define([
 
       this.setCoordinates(newCoords);
       if (!this.targetStations.isEmpty()) {
-        this.targetStations.sort();
+        this.sortStations();
       }
 
       this.trigger('locationpoll:progress', newCoords);
