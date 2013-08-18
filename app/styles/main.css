@@ -106,8 +106,8 @@ header {
   text-decoration: none;
 }
 .mode-toggle {
-  right: 15px;
-  top: 15px;
+  right: 12px;
+  top: 12px;
 }
 .mode-toggle a {
   z-index: 0;
