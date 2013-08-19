@@ -100,14 +100,14 @@ define([
     startGeoListening: function () {
       var user = this;
 
-      this.getCurrentLocation();
+      this.getCurrentLocation(true);
       this.fetchTargetStations();
 
       this.pollingId = setInterval(function () {
         user.pollCounter += User.TIMER_INTERVAL;
 
         if (user.pollCounter % User.USER_POLL_INTERVAL === 0) {
-          user.getCurrentLocation();
+          user.getCurrentLocation(user.pollCounter % User.USER_POLL_SORT_INTERVAL === 0);
         }
         if (user.pollCounter % User.STATION_POLL_INTERVAL === 0) {
           user.fetchTargetStations();
@@ -124,10 +124,10 @@ define([
       this.trigger('stationpoll:start');
     },
 
-    getCurrentLocation: function () {
+    getCurrentLocation: function (andSort) {
       if (this.locationPollInProgress) { return; }
 
-      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
+      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this, andSort),
           boundError = _.bind(this.onCurrentPositionError, this);
 
       this.locationPollInProgress = true;
@@ -135,15 +135,15 @@ define([
       this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
     },
 
-    onCurrentPositionSuccess: function (position) {
+    onCurrentPositionSuccess: function (andSort, position) {
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
 
       this.setCoordinates(newCoords);
-      this.setInitializeFlag('user');
-      if (!this.targetStations.isEmpty()) {
+      if (!this.targetStations.isEmpty() && (!this.initializedServices.user || andSort)) {
         this.sortStations();
       }
 
+      this.setInitializeFlag('user');
       this.locationPollInProgress = false;
       this.trigger('locationpoll:success', newCoords);
     },
@@ -153,9 +153,10 @@ define([
       this.trigger('locationpoll:error', err);
     }
   }, {
-    TIMER_INTERVAL: 5000,
-    STATION_POLL_INTERVAL: 20000,
-    USER_POLL_INTERVAL: 10000
+    TIMER_INTERVAL: 1000,
+    STATION_POLL_INTERVAL: 12000,
+    USER_POLL_INTERVAL: 5000,
+    USER_POLL_SORT_INTERVAL: 15000
   });
   _.extend(User.prototype, WithGeo);
 

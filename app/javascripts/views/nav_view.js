@@ -13,7 +13,8 @@ define([
     template: Handlebars.compile(navViewTemplate),
 
     events: {
-      'click .mode-btn': 'onModeClick'
+      'click .mode-btn': 'onModeClick',
+      'touchstart .mode-btn': 'onModeClick'
     },
 
     initialize: function (opts) {
@@ -35,7 +36,7 @@ define([
 
       var targetMode = $(e.currentTarget).data('type');
 
-      this.$modeToggle.addClass(targetMode + '-mode');
+      this.updateModeToggle(null, targetMode);
       this.currentUser.setSearchMode(targetMode);
     },
 

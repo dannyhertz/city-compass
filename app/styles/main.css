@@ -60,7 +60,6 @@ body {
   transition-delay: 0s;
 
   display: -webkit-box;
-  display: -webkit-flex;
   display: flex;
 
   -webkit-box-orient: vertical;
@@ -73,7 +72,6 @@ body {
   box-flex: 1;
 
   display: -webkit-box;
-  display: -webkit-flex;
   display: flex;
   -webkit-box-align: center;
   -webkit-justify-content: center;
@@ -82,13 +80,15 @@ body {
   -webkit-align-items: center;
 
   text-align: center;
-  border-top: 1px solid #0034BB;
   color: #255AE1;
   font-size: 2em;
-  font-weight: bold;
+  font-weight: 500;
 }
 .loader-view .progress-section:first-child {
-  border-top: none;
+  border-bottom: 1px solid #0C41C8;
+}
+.loader-view .progress-section:last-child {
+  border-top: 1px solid #3F74FB;
 }
 .loader-view .progress-section.ready {
   background-color: #255AE1;

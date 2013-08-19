@@ -203,7 +203,9 @@ define([
       this.setTargetMarker(this.nearestStation, oldNearestStation);
 
       this.removeNearybyStations();
-      this.renderNearbyStations(this.nearestStation);
+      if (this.currentUser.distanceBetween(this.nearestStation) < 1000) {
+        this.renderNearbyStations(this.nearestStation);
+      }
 
       // Update dem bounds!
       this.fitUserAndTargetStation();
