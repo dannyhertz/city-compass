@@ -188,7 +188,7 @@ define([
         this.map.fitBounds(fittedBounds);
 
         // For now zoom out a bit so avoid overlapping
-        this.map.setZoom(this.map.getZoom() - 2);
+        this.map.setZoom(this.map.getZoom() - 1);
       }
     },
 
