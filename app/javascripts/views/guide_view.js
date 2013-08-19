@@ -215,7 +215,7 @@ define([
       this.setUserMarker(coords);
 
       // Update dem bounds!
-      this.fitUserAndTargetStation();
+      // this.fitUserAndTargetStation();
     }
   });
 
