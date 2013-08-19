@@ -14,9 +14,8 @@ define([
       searchMode: 'bike'
     },
     geoOptions: {
-      enableHighAccuracy: true,
-      maximumAge : 10000,
-      timeout : 10000
+      enableHighAccuracy: false,
+      timeout: 8000
     },
     initializedServices: {
       user: false,
@@ -29,6 +28,7 @@ define([
       this.geoApi = window.navigator.geolocation;
       this.targetStations = new Stations(seedStations, { user: this });
 
+      this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
       this.listenTo(this, 'change:searchMode', this.sortStations);
     },
@@ -80,13 +80,6 @@ define([
       }
     },
 
-    getCurrentLocation: function () {
-      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
-          boundError = _.bind(this.onCurrentPositionError, this);
-
-      this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
-    },
-
     onStationsSort: function (stations) {
       var nearestStation = stations.first(),
           currentTarget = this.get('targetStation');
@@ -94,73 +87,74 @@ define([
       if (nearestStation !== currentTarget) {
         this.set('targetStation', stations.first());
         this.trigger('targetstation:new', stations);
-      } else {
-        this.trigger('targetstation:update', stations);
       }
 
+      this.trigger('stationpoll:success');
       this.setInitializeFlag('stations');
     },
 
     startGeoListening: function () {
-      this.startLocationPolling();
-      this.startStationPolling();
+      var user = this;
+
+      this.getCurrentLocation();
+      this.fetchTargetStations();
+
+      this.pollingId = setInterval(function () {
+        user.pollCounter += User.TIMER_INTERVAL;
+
+        if (user.pollCounter % User.USER_POLL_INTERVAL === 0) {
+          user.getCurrentLocation();
+        }
+        if (user.pollCounter % User.STATION_POLL_INTERVAL === 0) {
+          user.fetchTargetStations();
+        }
+      }, User.TIMER_INTERVAL);
     },
 
     stopGeoListening: function () {
-      this.stopLocationPolling();
-      this.stopStationPolling();
+      clearInterval(this.pollingId);
     },
 
-    startLocationPolling: function () {
-      this.trigger('locationpoll:start');
-
-      this.getCurrentLocation();
-      this.locationPollingId = setInterval(_.bind(function () {
-        this.getCurrentLocation();
-      }, this), User.USER_POLL_INTERVAL);
-
-      return this.locationPollingId;
-    },
-
-    stopLocationPolling: function () {
-      this.trigger('locationpoll:stop');
-      this.geoApi.clearWatch(this.locationPollingId);
-    },
-
-    startStationPolling: function () {
-      this.trigger('stationpoll:start');
-
+    fetchTargetStations: function () {
       this.targetStations.fetch();
-      this.stationPollingId = setInterval(_.bind(function () {
-        this.targetStations.fetch();
-      }, this), User.STATION_POLL_INTERVAL);
-
-      return this.stationPollingId;
+      this.trigger('stationpoll:start');
     },
 
-    stopStationPolling: function () {
-      this.trigger('stationpoll:stop');
-      clearInterval(this.stationPollingId);
+    getCurrentLocation: function () {
+      if (this.locationPollInProgress) { return; }
+
+      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
+          boundError = _.bind(this.onCurrentPositionError, this);
+
+      console.log('polling for location');
+      this.locationPollInProgress = true;
+      this.trigger('locationpoll:start');
+      this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
     },
 
     onCurrentPositionSuccess: function (position) {
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
 
+      console.log(position);
+
       this.setCoordinates(newCoords);
       this.setInitializeFlag('user');
-      if (!this.targetStations.isEmpty() && this.distanceBetween(newCoords > 25)) {
+      if (!this.targetStations.isEmpty()) {
         this.sortStations();
       }
 
-      this.trigger('locationpoll:progress', newCoords);
+      this.locationPollInProgress = false;
+      this.trigger('locationpoll:success', newCoords);
     },
 
     onCurrentPositionError: function (err) {
+      this.locationPollInProgress = false;
       this.trigger('locationpoll:error', err);
     }
   }, {
-    STATION_POLL_INTERVAL: 15000,
-    USER_POLL_INTERVAL: 5000
+    TIMER_INTERVAL: 5000,
+    STATION_POLL_INTERVAL: 20000,
+    USER_POLL_INTERVAL: 10000
   });
   _.extend(User.prototype, WithGeo);
 

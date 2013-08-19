@@ -55,7 +55,7 @@ define([
       this.$mapHolder = this.$('.map-holder');
 
       this.renderMap(this.$mapHolder);
-      this.renderAllStations();
+      //this.renderAllStations();
 
       this.attachMapEvents();
 
@@ -154,8 +154,7 @@ define([
         this.targetMarker = this.createMarker({
           coords: mapCoords,
           animation: true,
-          type: 'custom',
-          subType: 'target-station station'
+          type: 'google'
         });
       }
     },
@@ -186,7 +185,7 @@ define([
         this.map.fitBounds(fittedBounds);
 
         // For now zoom out a bit so avoid overlapping
-        //this.map.setZoom(this.map.getZoom() - 1);
+        this.map.setZoom(this.map.getZoom() - 1);
       }
     },
 
