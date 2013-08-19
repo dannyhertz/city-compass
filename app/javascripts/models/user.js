@@ -14,8 +14,8 @@ define([
       searchMode: 'bike'
     },
     geoOptions: {
-      enableHighAccuracy: false,
-      timeout: 8000
+      enableHighAccuracy: true,
+      timeout: 12000
     },
     initializedServices: {
       user: false,
@@ -26,7 +26,7 @@ define([
       var seedStations = (opts || {}).seedStations || [];
 
       this.geoApi = window.navigator.geolocation;
-      this.targetStations = new Stations(seedStations, { user: this });
+      this.targetStations = new Stations([], { user: this, });
 
       this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
@@ -70,12 +70,14 @@ define([
       var allDone = false;
 
       this.initializedServices[service] = true;
+      this.trigger('ready:' + service, service);
+
       allDone = _.every(this.initializedServices, function (service) {
         return !!service;
       });
 
       if (allDone) {
-        this.trigger('ready');
+        this.trigger('ready:all', 'all');
         this.setInitializeFlag = function () {}; //set noop
       }
     },
@@ -87,6 +89,8 @@ define([
       if (nearestStation !== currentTarget) {
         this.set('targetStation', stations.first());
         this.trigger('targetstation:new', stations);
+      } else {
+        this.trigger('targetstation:update', stations);
       }
 
       this.trigger('stationpoll:success');
@@ -126,7 +130,6 @@ define([
       var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
           boundError = _.bind(this.onCurrentPositionError, this);
 
-      console.log('polling for location');
       this.locationPollInProgress = true;
       this.trigger('locationpoll:start');
       this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
@@ -134,8 +137,6 @@ define([
 
     onCurrentPositionSuccess: function (position) {
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
-
-      console.log(position);
 
       this.setCoordinates(newCoords);
       this.setInitializeFlag('user');

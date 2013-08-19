@@ -21,7 +21,7 @@ define([
     },
 
     mapDefaultOptions: {
-      center: new google.maps.LatLng(-34.397, 150.644),
+      center: new google.maps.LatLng(0, 0),
       zoom: 17,
       disableDefaultUI: true,
       panControl: false,
@@ -76,20 +76,24 @@ define([
       return this.markerTemplate({ type: type || 'self' });
     },
 
-    renderAllStations: function () {
-      var allStations = this.currentUser.targetStations,
-          targetStation = this.currentUser.getNearestStation();
-
-      allStations.forEach(function (station) {
-        if (station !== targetStation) {
-          this.createMarker({
-            coords: station.getCoordinates(),
-            animation: false,
-            type: 'custom',
-            subType: 'station'
-          });
-        }
+    renderNearbyStations: function (targetStation) {
+      this.nearbyMarkers = targetStation.get('nearbyStations').map(function (station) {
+        var currentStation = this.currentUser.targetStations.get(station.id);
+        return this.createMarker({
+          coords: currentStation.getCoordinates(),
+          animation: false,
+          type: 'custom',
+          subType: 'station'
+        });
       }, this);
+    },
+
+    removeNearybyStations: function (targetStation) {
+      if (this.nearbyMarkers) {
+        this.nearbyMarkers.forEach(function (marker) {
+          marker.setMap(null);
+        }, this);
+      }
     },
 
     attachMapEvents: function () {
@@ -145,8 +149,8 @@ define([
       }
     },
 
-    setTargetMarker: function (mapCoords) {
-      mapCoords = this.normalizeMapCoords(mapCoords);
+    setTargetMarker: function (newStation, previousStation) {
+      var mapCoords = this.normalizeMapCoords(newStation.getCoordinates());
 
       if (this.targetMarker) {
         this.moveMarker(this.targetMarker, mapCoords);
@@ -181,41 +185,33 @@ define([
         ]);
 
         this.currentUser.trigger('fittingmap');
-
         this.map.fitBounds(fittedBounds);
 
         // For now zoom out a bit so avoid overlapping
-        this.map.setZoom(this.map.getZoom() - 1);
+        this.map.setZoom(this.map.getZoom() - 2);
       }
     },
 
     onMapResize: _.debounce(function () {
       this.fitUserAndTargetStation();
-    }, 250),
+    }, 100),
 
     onNewTargetStation: function (stations) {
+      var oldNearestStation = this.nearestStation;
+
       this.nearestStation = this.currentUser.getNearestStation();
-      this.setTargetMarker(this.nearestStation.getCoordinates());
+      this.setTargetMarker(this.nearestStation, oldNearestStation);
+
+      this.removeNearybyStations();
+      this.renderNearbyStations(this.nearestStation);
 
       // Update dem bounds!
       this.fitUserAndTargetStation();
     },
 
     onUserLocationChange: function (user, coords) {
-      var currentMapCoords;
-
-      // Convert coords to google coords
-      if (coords instanceof google.maps.LatLng) {
-        currentMapCoords = coords;
-      } else {
-        currentMapCoords = new google.maps.LatLng(coords.latitude, coords.longitude);
-      }
-
-      // Move the users current location
+      var currentMapCoords = this.normalizeMapCoords(coords);
       this.setUserMarker(coords);
-
-      // Update dem bounds!
-      // this.fitUserAndTargetStation();
     }
   });
 

@@ -7,23 +7,18 @@ define([
   'backbone',
   'handlebars',
   'models/user',
+  'views/loader_view',
   'views/nav_view',
   'views/guide_view',
   'views/dash_view',
-  'text!../templates/main_view.hbs'
-], function($, _, Backbone, Handlebars, User, NavView, GuideView, DashView, mainViewTemplate) {
+  'text!../templates/app_view.hbs'
+], function($, _, Backbone, Handlebars, User, LoaderView, NavView, GuideView, DashView, appViewTemplate) {
 
   var AppView = Backbone.View.extend({
-    template: Handlebars.compile(mainViewTemplate),
+    template: Handlebars.compile(appViewTemplate),
 
     initialize: function () {
       this.currentUser = new User({}, { seedStations: SEEDS.stations });
-
-      this.listenToOnce(this.currentUser, 'ready', function () {
-        $('body').removeClass('loading');
-      });
-
-      this.listenTo(this.currentUser, 'all', this.updateDebugInfo);
 
       this.currentUser.startGeoListening();
     },
@@ -34,12 +29,9 @@ define([
       this.navView = new NavView({ user: this.currentUser, el: this.$('.nav-view') }).render();
       this.guideView = new GuideView({ user: this.currentUser, el: this.$('.guide-view') }).render();
       this.dashView = new DashView({ user: this.currentUser, el: this.$('.dash-view') }).render();
+      this.loaderView = new LoaderView({ user: this.currentUser, el: this.$('.loader-view') }).render();
 
       return this;
-    },
-
-    updateDebugInfo: function (text) {
-      $('.debug-holder').text(Math.round(+new Date()/1000) + ' - ' + text);
     }
   });
 

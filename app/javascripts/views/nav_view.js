@@ -34,6 +34,8 @@ define([
       e.preventDefault();
 
       var targetMode = $(e.currentTarget).data('type');
+
+      this.$modeToggle.addClass(targetMode + '-mode');
       this.currentUser.setSearchMode(targetMode);
     },
 
