@@ -167,7 +167,13 @@ define([
     },
 
     getFittedBounds: function (points) {
-      var bounds = new google.maps.LatLngBounds();
+      var bounds = new google.maps.LatLngBounds(),
+          midX, lowY;
+
+      // Make this hack less... hacky?
+      midX = (points[0].latitude + points[1].latitude) / 2;
+      lowY = Math.min(points[0].longitude, points[1].longitude) - 0.0005;
+      points.push({ latitude: midX, longitude: lowY });
 
       points.forEach(function (p) {
         bounds.extend(new google.maps.LatLng(p.latitude, p.longitude));
