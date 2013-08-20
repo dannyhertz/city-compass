@@ -189,11 +189,7 @@ define([
           this.nearestStation.getCoordinates()
         ]);
 
-        this.currentUser.trigger('fittingmap');
         this.map.fitBounds(fittedBounds);
-
-        // For now zoom out a bit so avoid overlapping
-        this.map.setZoom(this.map.getZoom() - 1);
       }
     },
 

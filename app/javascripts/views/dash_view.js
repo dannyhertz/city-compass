@@ -83,7 +83,7 @@ define([
         units: targetDistance.unit,
         quantity: station.getSearchQuantity(searchMode),
         mode: searchMode,
-        subways: station.get('subways')
+        subways: station.get('subways').slice(0,3)
       };
     }
   });

@@ -14,7 +14,7 @@ define([
       searchMode: 'bike'
     },
     geoOptions: {
-      enableHighAccuracy: true,
+      enableHighAccuracy: false,
       timeout: 9000
     },
     initializedServices: {
@@ -162,9 +162,8 @@ define([
     }
   }, {
     TIMER_INTERVAL: 1000,
-    STATION_POLL_INTERVAL: 12000,
-    USER_POLL_INTERVAL: 5000,
-    USER_POLL_SORT_INTERVAL: 15000
+    STATION_POLL_INTERVAL: 20000,
+    USER_POLL_INTERVAL: 10000,
   });
   _.extend(User.prototype, WithGeo);
 
