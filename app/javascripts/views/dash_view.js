@@ -47,6 +47,7 @@ define([
     },
 
     onFooterTap: function (e) {
+      e.preventDefault();
       $(e.currentTarget).toggleClass('flipped');
     },
 
