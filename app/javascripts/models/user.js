@@ -15,7 +15,7 @@ define([
     },
     geoOptions: {
       enableHighAccuracy: true,
-      timeout: 12000
+      timeout: 9000
     },
     initializedServices: {
       user: false,
@@ -25,8 +25,10 @@ define([
     initialize: function (attrs, opts) {
       var seedStations = (opts || {}).seedStations || [];
 
+      window.user = this;
+
       this.geoApi = window.navigator.geolocation;
-      this.targetStations = new Stations([], { user: this, });
+      this.targetStations = new Stations(seedStations, { user: this, });
 
       this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
@@ -86,6 +88,11 @@ define([
       var nearestStation = stations.first(),
           currentTarget = this.get('targetStation');
 
+      // Skip if only seed stations
+      if (!nearestStation.has('latitude')) {
+        return;
+      }
+
       if (nearestStation !== currentTarget) {
         this.set('targetStation', stations.first());
         this.trigger('targetstation:new', stations);
@@ -106,8 +113,8 @@ define([
       this.pollingId = setInterval(function () {
         user.pollCounter += User.TIMER_INTERVAL;
 
-        if (user.pollCounter % User.USER_POLL_INTERVAL === 0) {
-          user.getCurrentLocation(user.pollCounter % User.USER_POLL_SORT_INTERVAL === 0);
+        if (user.pollCounter % User.USER_POLL_INTERVAL === 0 && !this.locationPollInProgress) {
+          user.getCurrentLocation();
         }
         if (user.pollCounter % User.STATION_POLL_INTERVAL === 0) {
           user.fetchTargetStations();
@@ -124,10 +131,10 @@ define([
       this.trigger('stationpoll:start');
     },
 
-    getCurrentLocation: function (andSort) {
+    getCurrentLocation: function () {
       if (this.locationPollInProgress) { return; }
 
-      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this, andSort),
+      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
           boundError = _.bind(this.onCurrentPositionError, this);
 
       this.locationPollInProgress = true;
@@ -135,11 +142,12 @@ define([
       this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
     },
 
-    onCurrentPositionSuccess: function (andSort, position) {
-      var newCoords = _.pick(position.coords, ['latitude', 'longitude']);
+    onCurrentPositionSuccess: function (position) {
+      var newCoords = _.pick(position.coords, ['latitude', 'longitude']),
+          distanceDelta = this.distanceBetween(newCoords);
 
       this.setCoordinates(newCoords);
-      if (!this.targetStations.isEmpty() && (!this.initializedServices.user || andSort)) {
+      if (!this.targetStations.isEmpty() && (!this.initializedServices.user || distanceDelta > 25)) {
         this.sortStations();
       }
 

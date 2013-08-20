@@ -13,6 +13,11 @@ define([
   var DashView = Backbone.View.extend({
     template: Handlebars.compile(dashViewTemplate),
 
+    events: {
+      'click .footer-card': 'onFooterTap',
+      'touchstart .footer-card': 'onFooterTap'
+    },
+
     initialize: function (opts) {
       this.currentUser = opts.user;
       window.user = this.currentUser;
@@ -36,11 +41,18 @@ define([
       this.$targetRange = this.$('.target-range:first');
       this.$targetUnit = this.$('.target-unit:first');
 
+      this.$targetSubways = this.$('.target-subways');
+
       return this;
     },
 
+    onFooterTap: function (e) {
+      $(e.currentTarget).toggleClass('flipped');
+    },
+
     updateDashStation: function (user, station) {
-      var dashData = this.getDashData(user, station);
+      var dashData = this.getDashData(user, station),
+          subwayFragment = document.createDocumentFragment();
 
       this.$targetAddress.text(dashData.name);
 
@@ -49,6 +61,11 @@ define([
 
       this.$targetRange.text(dashData.distance);
       this.$targetUnit.text(dashData.units);
+
+      dashData.subways.forEach(function (sub) {
+        subwayFragment.appendChild($('<span>').addClass('mta-symbol _' + sub).text(sub)[0]);
+      }, this);
+      this.$targetSubways.html(subwayFragment);
     },
 
     updateCurrentStation: function () {
@@ -64,7 +81,8 @@ define([
         distance: targetDistance.distance,
         units: targetDistance.unit,
         quantity: station.getSearchQuantity(searchMode),
-        mode: searchMode
+        mode: searchMode,
+        subways: station.get('subways')
       };
     }
   });

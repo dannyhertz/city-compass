@@ -151,7 +151,6 @@ define([
 
     setTargetMarker: function (newStation, previousStation) {
       var mapCoords = this.normalizeMapCoords(newStation.getCoordinates());
-
       if (this.targetMarker) {
         this.moveMarker(this.targetMarker, mapCoords);
       } else {

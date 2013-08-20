@@ -1,9 +1,19 @@
-<div class="target-info">
-  <div class="target-availability">
-    <span class="target-quantity">{{quantity}}</span> <span class="target-type">{{mode}}</span> available
-  </div>
-  <div class="target-address">{{name}}</div>
-  <div class="target-distance">
-    <span class="target-range">{{distance}}</span> <span class="target-unit">{{units}}</span> away
-  </div>
+<div class="footer-card">
+	<div class="target-info card-front card-side">
+	  <div class="target-availability">
+	    <span class="target-quantity">{{quantity}}</span> <span class="target-type">{{mode}}</span> available
+	  </div>
+	  <div class="target-address">{{name}}</div>
+	  <div class="target-distance">
+	    <span class="target-range">{{distance}}</span> <span class="target-unit">{{units}}</span> away
+	  </div>
+	</div>
+	<div class="target-meta card-back card-side">
+		<div class="subway-text">NEARBY SUBWAYS</div>
+		<div class="target-subways">
+			{{#each subways}}
+				<span class="mta-symbol _{{this}}">{{this}}</span>
+			{{/each}}
+		</div>
+	</div>
 </div>

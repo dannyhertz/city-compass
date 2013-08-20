@@ -247,11 +247,49 @@ footer {
   bottom: 0;
   width: 100%;
   min-height: 8em;
-  padding: 10px 12px;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-top: 1px solid #ccc;
+  -webkit-perspective: 800px;
 }
+.footer-card {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+
+  -webkit-transition: -webkit-transform .75s;
+  transition: transform .75s;
+
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+.footer-card.flipped {
+  -webkit-transform: rotateX(180deg);
+  transform: rotateY(180deg);
+}
+.card-side {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  border-top: 1px solid #ccc;
+  background-color: rgba(255, 255, 255, 0.9);
+  -webkit-backface-visibility: hidden;
+}
+.card-front {}
+.card-back {
+  -webkit-transform: rotateX(180deg);
+  transform: rotateY(180deg);
+}
+
+
+.target-meta {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  text-align: center;
+}
+
 .target-address {
   font-size: 2.25em;
   line-height: 1.3;
@@ -268,4 +306,67 @@ footer {
 .target-distance {
   font-size: 1.2em;
   color: #666;
+}
+
+.subway-text {
+  color: #444;
+  font-weight: bold;
+  margin-top: 0.3em;
+}
+.target-subways {
+  display: -webkit-box;
+  display: box;
+
+  -webkit-box-align: start;
+  box-align: start;
+
+  -webkit-box-pack: center;
+  box-pack: center;
+
+  height: 100%;
+  margin-top: .2em;
+}
+.mta-symbol {
+  display: block;
+  height: 2.2em;
+  width: 2.2em;
+  margin: 5px;
+  border-radius: 2.2em;
+  text-align: center;
+  line-height: 2.2em;
+  font-size: 1.7em;
+  font-weight: 500;
+  color: #FFF;
+  background-color: red;
+}
+
+.mta-symbol._A, .mta-symbol._C, .mta-symbol._E {
+  background-color: #2850AD;
+}
+.mta-symbol._B, .mta-symbol._D, .mta-symbol._F, .mta-symbol._M {
+  background-color: #FF6319;
+}
+.mta-symbol._G {
+  background-color: #6CBE45;
+}
+.mta-symbol._J, .mta-symbol._Z {
+  background-color: #996633;
+}
+.mta-symbol._L {
+  background-color: #A7A9AC;
+}
+.mta-symbol._N, .mta-symbol._Q, .mta-symbol._R {
+  background-color: #FCCC0A;
+}
+.mta-symbol._S {
+  background-color: #808183;
+}
+.mta-symbol._1, .mta-symbol._2, .mta-symbol._3 {
+  background-color: #EE352E;
+}
+.mta-symbol._4, .mta-symbol._5, .mta-symbol._6 {
+  background-color: #00933C;
+}
+.mta-symbol._7 {
+  background-color: #B933AD;
 }

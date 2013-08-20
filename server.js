@@ -26,7 +26,7 @@ if ('development' == app.get('env')) {
 }
 
 // Seed data
-var seedStations = require('./seeds/stations.json');
+var seedStations = require('./seeds/stations-with-mta.json');
 
 app.get('/', function (req, res) {
   res.render('index.html.ejs', { seedStations: seedStations });
