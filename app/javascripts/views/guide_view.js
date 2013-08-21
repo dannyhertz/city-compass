@@ -214,7 +214,7 @@ define([
 
     onUserLocationChange: function (user, coords) {
       var currentMapCoords = this.normalizeMapCoords(coords);
-      this.setUserMarker(coords);
+      this.setUserMarker(currentMapCoords);
     }
   });
 

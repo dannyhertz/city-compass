@@ -28,7 +28,7 @@ define([
       window.user = this;
 
       this.geoApi = window.navigator.geolocation;
-      this.targetStations = new Stations(seedStations, { user: this, });
+      this.targetStations = new Stations(seedStations, { user: this });
 
       this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
@@ -163,7 +163,7 @@ define([
   }, {
     TIMER_INTERVAL: 1000,
     STATION_POLL_INTERVAL: 20000,
-    USER_POLL_INTERVAL: 10000,
+    USER_POLL_INTERVAL: 10000
   });
   _.extend(User.prototype, WithGeo);
 
