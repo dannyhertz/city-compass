@@ -1,5 +1,4 @@
 node_modules
-.sass-cache
 test/bower_components/
 app/bower_components/
 .DS_Store
