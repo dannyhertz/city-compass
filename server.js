@@ -29,7 +29,10 @@ if ('development' == app.get('env')) {
 var seedStations = require('./seeds/stations-with-mta.json');
 
 app.get('/', function (req, res) {
-  res.render('index.html.ejs', { seedStations: seedStations });
+  res.render('index.html.ejs', {
+    env: process.env.NODE_ENV,
+    seedStations: seedStations
+  });
 });
 
 app.get('/api/stations', function (req, res) {

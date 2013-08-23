@@ -5,12 +5,11 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'handlebars',
-  'text!../templates/loader_view.hbs'
-], function($, _, Backbone, Handlebars, loaderViewTemplate) {
+  'hbs!../templates/loader_view'
+], function($, _, Backbone, loaderViewTemplate) {
 
   var LoaderView = Backbone.View.extend({
-    template: Handlebars.compile(loaderViewTemplate),
+    template: loaderViewTemplate,
 
     initialize: function (opts) {
       this.currentUser = opts.user;
@@ -21,9 +20,7 @@ define([
     },
 
     render: function () {
-      var templateData = {};
-      this.$el.html(this.template(templateData));
-
+      this.$el.html(this.template({}));
       return this;
     },
 

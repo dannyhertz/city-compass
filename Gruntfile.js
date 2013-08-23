@@ -50,10 +50,6 @@ module.exports = function (grunt) {
           out: '<%= yeoman.build %>/javascripts/app.min.js',
           optimize: 'uglify',
           findNestedDependencies: true,
-          wrap: true,
-          paths: {
-            'templates': 'templates'
-          },
           preserveLicenseComments: false,
           useStrict: true
         }
@@ -63,17 +59,6 @@ module.exports = function (grunt) {
       all: {
         rjsConfig: '<%= yeoman.app %>/javascripts/main.js'
       }
-    },
-    handlebars: {
-      compile: {
-        options: {
-          namespace: 'JST',
-          amd: true
-        },
-        files: {
-          '<%= yeoman.build %>/javascripts/templates.js': ['<%= yeoman.app %>/javascripts/templates/*.hbs']
-        }
-      }
     }
   });
 
@@ -81,19 +66,17 @@ module.exports = function (grunt) {
     grunt.file.write('.tmp/javascripts/templates.js', 'this.JST = this.JST || {};');
   });
 
-  grunt.registerTask('build', [
-    'jshint',
-    'handlebars',
-    'requirejs'
+  grunt.registerTask('default', [
+    'jshint'
   ]);
 
   grunt.registerTask('server', [
-    'handlebars',
     'express:dev',
     'watch'
   ]);
 
-  grunt.registerTask('default', [
-    'jshint'
+  grunt.registerTask('build', [
+    'jshint',
+    'requirejs'
   ]);
 };

@@ -5,13 +5,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'handlebars',
   'mixins/with_view_text_utils',
-  'text!../templates/dash_view.hbs'
-], function($, _, Backbone, Handlebars, WithViewTextUtils, dashViewTemplate) {
+  'hbs!../templates/dash_view'
+], function($, _, Backbone, WithViewTextUtils, dashViewTemplate) {
 
   var DashView = Backbone.View.extend({
-    template: Handlebars.compile(dashViewTemplate),
+    template: dashViewTemplate,
 
     events: {
       'click .footer-card': 'onFooterTap',

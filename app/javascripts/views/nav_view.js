@@ -5,12 +5,11 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'handlebars',
-  'text!../templates/nav_view.hbs'
-], function($, _, Backbone, Handlebars, navViewTemplate) {
+  'hbs!../templates/nav_view'
+], function($, _, Backbone, navViewTemplate) {
 
   var NavView = Backbone.View.extend({
-    template: Handlebars.compile(navViewTemplate),
+    template: navViewTemplate,
 
     events: {
       'click .mode-btn': 'onModeClick',

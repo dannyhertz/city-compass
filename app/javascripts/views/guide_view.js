@@ -5,15 +5,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'handlebars',
   'richmarker',
-  'text!../templates/guide_view.hbs',
-  'text!../templates/map_marker.hbs'
-], function($, _, Backbone, Handlebars, RichMarker, guideViewTemplate, markerTemplate) {
+  'hbs!../templates/guide_view',
+  'hbs!../templates/map_marker'
+], function($, _, Backbone, RichMarker, guideViewTemplate, markerTemplate) {
 
   var GuideView = Backbone.View.extend({
-    template: Handlebars.compile(guideViewTemplate),
-    markerTemplate: Handlebars.compile(markerTemplate),
+    template: guideViewTemplate,
+    markerTemplate: markerTemplate,
 
     markerTypes: {
       google: google.maps.Marker,

@@ -5,17 +5,16 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'handlebars',
   'models/user',
   'views/loader_view',
   'views/nav_view',
   'views/guide_view',
   'views/dash_view',
-  'text!../templates/app_view.hbs'
-], function($, _, Backbone, Handlebars, User, LoaderView, NavView, GuideView, DashView, appViewTemplate) {
+  'hbs!../templates/app_view'
+], function($, _, Backbone, User, LoaderView, NavView, GuideView, DashView, appViewTemplate) {
 
   var AppView = Backbone.View.extend({
-    template: Handlebars.compile(appViewTemplate),
+    template: appViewTemplate,
 
     initialize: function () {
       this.currentUser = new User({}, { seedStations: SEEDS.stations });
