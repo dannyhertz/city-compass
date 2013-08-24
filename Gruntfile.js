@@ -41,6 +41,19 @@ module.exports = function (grunt) {
         '!<%= yeoman.app %>/javascripts/vendor/*'
       ]
     },
+    cssmin: {
+      minify: {
+        src: '<%= yeoman.app %>/styles/main.css',
+        dest: '<%= yeoman.build %>/styles/app.min.css'
+      }
+    },
+    uglify: {
+      dist: {
+        files: {
+          '<%= yeoman.build %>/javascripts/modernizr.min.js': '<%= yeoman.app %>/javascripts/bower_components/modernizr/modernizr.js'
+        }
+      }
+    },
     requirejs: {
       compile: {
         options: {
@@ -51,7 +64,11 @@ module.exports = function (grunt) {
           optimize: 'uglify',
           findNestedDependencies: true,
           preserveLicenseComments: false,
-          useStrict: true
+          useStrict: true,
+          paths: {
+            requireLib: 'bower_components/requirejs/require'
+          },
+          include: ['requireLib']
         }
       }
     },
@@ -60,10 +77,6 @@ module.exports = function (grunt) {
         rjsConfig: '<%= yeoman.app %>/javascripts/main.js'
       }
     }
-  });
-
-  grunt.registerTask('createDefaultTemplate', function () {
-    grunt.file.write('.tmp/javascripts/templates.js', 'this.JST = this.JST || {};');
   });
 
   grunt.registerTask('default', [
@@ -77,6 +90,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'jshint',
+    'cssmin',
+    'uglify',
     'requirejs'
   ]);
 };

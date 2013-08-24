@@ -1,4 +1,4 @@
+app/javascripts/bower_components
+app/build
 node_modules
-test/bower_components/
-app/bower_components/
 .DS_Store
