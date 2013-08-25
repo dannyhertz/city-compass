@@ -60,15 +60,12 @@ body {
   transition-delay: 0s;
 
   display: -webkit-box;
-  display: flex;
 
   -webkit-box-orient: vertical;
-  -moz-box-orient: vertical;
   box-orient: vertical;
 }
 .loader-view .progress-section {
   -webkit-box-flex: 1;
-  -moz-box-flex: 1;
   box-flex: 1;
 
   display: -webkit-box;

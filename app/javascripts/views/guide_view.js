@@ -30,7 +30,6 @@ define([
       streetViewControl: false,
       disableDoubleClickZoom: true,
       overviewMapControl: false,
-      draggable: false,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     },
 
@@ -54,7 +53,6 @@ define([
       this.$mapHolder = this.$('.map-holder');
 
       this.renderMap(this.$mapHolder);
-      //this.renderAllStations();
 
       this.attachMapEvents();
 
@@ -76,15 +74,17 @@ define([
     },
 
     renderNearbyStations: function (targetStation) {
-      this.nearbyMarkers = targetStation.get('nearbyStations').map(function (station) {
+      var nearbyMarkers = targetStation.get('nearbyStations').map(function (station) {
         var currentStation = this.currentUser.targetStations.get(station.id);
-        return this.createMarker({
+        return currentStation ? this.createMarker({
           coords: currentStation.getCoordinates(),
           animation: false,
           type: 'custom',
           subType: 'station'
-        });
+        }) : null;
       }, this);
+
+      this.nearbyMarkers = _.compact(nearbyMarkers);
     },
 
     removeNearybyStations: function (targetStation) {
@@ -98,6 +98,8 @@ define([
     attachMapEvents: function () {
       if (this.map) {
         $(window).on('resize', _.bind(this.onMapResize, this));
+        google.maps.event.addListener(this.map, 'dragstart', _.bind(this.onMapDragStart, this));
+        google.maps.event.addListener(this.map, 'dragend', _.bind(this.onMapDragEnd, this));
       }
     },
 
@@ -181,20 +183,37 @@ define([
       return bounds;
     },
 
-    fitUserAndTargetStation: function () {
+    fitUserAndTargetStation: function (options) {
       if (this.currentUser && this.currentUser.hasCoordinates() && this.nearestStation && this.nearestStation.hasCoordinates()) {
         var fittedBounds = this.getFittedBounds([
           this.currentUser.getCoordinates(),
           this.nearestStation.getCoordinates()
         ]);
 
-        this.map.fitBounds(fittedBounds);
+        console.log(fittedBounds);
+        if (options && options.panTo) {
+          this.map.panTo(fittedBounds.getCenter());
+        } else {
+          this.map.fitBounds(fittedBounds);
+        }
       }
     },
 
     onMapResize: _.debounce(function () {
       this.fitUserAndTargetStation();
     }, 100),
+
+    onMapDragEnd: function () {
+      console.log('start timer');
+      this.dragTimer = setTimeout(_.bind(function () {
+        this.fitUserAndTargetStation({ panTo: true });
+      }, this), GuideView.DRAG_TIMEOUT);
+    },
+
+    onMapDragStart: function () {
+      console.log('clearing timer');
+      clearTimeout(this.dragTimer);
+    },
 
     onNewTargetStation: function (stations) {
       var oldNearestStation = this.nearestStation;
@@ -215,6 +234,8 @@ define([
       var currentMapCoords = this.normalizeMapCoords(coords);
       this.setUserMarker(currentMapCoords);
     }
+  }, {
+    DRAG_TIMEOUT: 1500
   });
 
   return GuideView;
