@@ -14,6 +14,10 @@ define([
     template: guideViewTemplate,
     markerTemplate: markerTemplate,
 
+    events: {
+      'touchmove .map-holder': 'onMapTouch'
+    },
+
     markerTypes: {
       google: google.maps.Marker,
       custom: RichMarker
@@ -97,7 +101,13 @@ define([
 
     attachMapEvents: function () {
       if (this.map) {
+        // Use dom level events to prevent zooming on GMaps
+        this.rawMapHolder = document.querySelector('.map-holder');
+        this.bindedMapMoveHandler = _.bind(this.onMapMove, this);
+        this.rawMapHolder.addEventListener('touchmove', this.bindedMapMoveHandler, true);
+
         $(window).on('resize', _.bind(this.onMapResize, this));
+
         google.maps.event.addListener(this.map, 'dragstart', _.bind(this.onMapDragStart, this));
         google.maps.event.addListener(this.map, 'dragend', _.bind(this.onMapDragEnd, this));
       }
@@ -110,7 +120,9 @@ define([
         } else {
           google.maps.event.clearInstanceListeners(this.map);
         }
+
         $(window).off('resize');
+        this.rawMapHolder.removeEventListener('touchmove', this.bindedMapMoveHandler, true);
       }
     },
 
@@ -199,6 +211,13 @@ define([
       }
     },
 
+    onMapMove: function (e) {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+
     onMapResize: _.debounce(function () {
       this.fitUserAndTargetStation();
     }, 100),
@@ -210,8 +229,7 @@ define([
       }, this), GuideView.DRAG_TIMEOUT);
     },
 
-    onMapDragStart: function () {
-      console.log('clearing timer');
+    onMapDragStart: function (e) {
       clearTimeout(this.dragTimer);
     },
 

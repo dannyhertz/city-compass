@@ -13,7 +13,7 @@ define([
 
     events: {
       'click .mode-btn': 'onModeClick',
-      'touchstart .mode-btn': 'onModeClick'
+      'touchend .mode-btn': 'onModeClick'
     },
 
     initialize: function (opts) {

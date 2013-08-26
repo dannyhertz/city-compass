@@ -14,7 +14,7 @@ define([
 
     events: {
       'click .footer-card': 'onFooterTap',
-      'touchstart .footer-card': 'onFooterTap'
+      'touchend .footer-card': 'onFooterTap'
     },
 
     initialize: function (opts) {
