@@ -54,6 +54,19 @@ module.exports = function (grunt) {
         }
       }
     },
+    cachebreaker : {
+      options: {
+        remove: ''
+      },
+      js: {
+        asset_url: 'build/javascripts/app.min.js',
+        file: 'views/index.html.ejs'
+      },
+      css: {
+        asset_url: 'build/styles/app.min.css',
+        file: 'views/index.html.ejs'
+      }
+    },
     requirejs: {
       compile: {
         options: {
@@ -92,6 +105,8 @@ module.exports = function (grunt) {
     'jshint',
     'cssmin',
     'uglify',
-    'requirejs'
+    'requirejs',
+    'cachebreaker:css',
+    'cachebreaker:js'
   ]);
 };

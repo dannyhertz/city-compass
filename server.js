@@ -20,7 +20,7 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'app')));
+app.use(express.static(path.join(__dirname, 'app'), { maxAge: 31536000000 }));
 
 if (app.get('env') == 'development') {
   app.use(express.errorHandler());

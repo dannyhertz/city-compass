@@ -32,7 +32,8 @@
     "grunt-open": "~0.2.0",
     "matchdep": "~0.1.2",
     "connect-livereload": "~0.2.0",
-    "grunt-contrib-handlebars": "~0.5.10"
+    "grunt-contrib-handlebars": "~0.5.10",
+    "grunt-cache-breaker": "~0.5.3"
   },
   "engines": {
     "node": ">=0.8.0"
