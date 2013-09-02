@@ -181,14 +181,39 @@ define([
 
     getFittedBounds: function (points) {
       var bounds = new google.maps.LatLngBounds(),
-          midX, lowY;
+          newPoints = [],
+          minLat, minLong, maxLat, maxLong;
+
+      minLat = minLong = 180,
+      maxLat = maxLong = -180;
 
       // Make this hack less... hacky?
-      midX = (points[0].latitude + points[1].latitude) / 2;
-      lowY = Math.min(points[0].longitude, points[1].longitude) - 0.0005;
-      points.push({ latitude: midX, longitude: lowY });
+      points.forEach(function (currPoint) {
+        if (currPoint.latitude < minLat) {
+          minLat = currPoint.latitude;
+        }
+        if (currPoint.latitude > maxLat) {
+          maxLat = currPoint.latitude;
+        }
+        if (currPoint.longitude < minLong) {
+          minLong = currPoint.longitude;
+        }
+        if (currPoint.longitude > maxLong) {
+          maxLong = currPoint.longitude;
+        }
+      });
 
-      points.forEach(function (p) {
+      // Create most NE SW points and then some
+      newPoints.push({
+        latitude: minLat - GuideView.GEO_PADDING,
+        longitude: minLong - GuideView.GEO_PADDING
+      });
+      newPoints.push({
+        latitude: maxLat + GuideView.GEO_PADDING,
+        longitude: maxLong + GuideView.GEO_PADDING
+      });
+
+      newPoints.forEach(function (p) {
         bounds.extend(new google.maps.LatLng(p.latitude, p.longitude));
       });
 
@@ -197,16 +222,15 @@ define([
 
     fitUserAndTargetStation: function (options) {
       if (this.currentUser && this.currentUser.hasCoordinates() && this.nearestStation && this.nearestStation.hasCoordinates()) {
-        var fittedBounds = this.getFittedBounds([
+        this.latestBounds = this.getFittedBounds([
           this.currentUser.getCoordinates(),
           this.nearestStation.getCoordinates()
         ]);
 
-        console.log(fittedBounds);
         if (options && options.panTo) {
-          this.map.panTo(fittedBounds.getCenter());
+          this.map.panTo(this.latestBounds.getCenter());
         } else {
-          this.map.fitBounds(fittedBounds);
+          this.map.fitBounds(this.latestBounds);
         }
       }
     },
@@ -251,9 +275,14 @@ define([
     onUserLocationChange: function (user, coords) {
       var currentMapCoords = this.normalizeMapCoords(coords);
       this.setUserMarker(currentMapCoords);
+
+      if (this.latestBounds && !this.latestBounds.contains(currentMapCoords)) {
+        this.fitUserAndTargetStation();
+      }
     }
   }, {
-    DRAG_TIMEOUT: 1500
+    DRAG_TIMEOUT: 1500,
+    GEO_PADDING: 0.0005
   });
 
   return GuideView;

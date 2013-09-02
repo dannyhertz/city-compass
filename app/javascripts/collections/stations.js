@@ -26,7 +26,7 @@ define([
       var compareVal;
 
       compareVal = station.distanceBetween(this.userReference);
-      if (this.hasComparePenalty(station)) {
+      if (this.hasComparePenalty(station) || station.get('skipped')) {
         compareVal *= 100;
       }
 

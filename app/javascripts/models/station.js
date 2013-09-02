@@ -23,6 +23,15 @@ define([
       });
     },
 
+    skip: function () {
+      var station = this;
+
+      station.set('skipped', true);
+      setTimeout(function () {
+        station.set('skipped', false);
+      }, Station.SKIP_TIME);
+    },
+
     getStationName: function () {
       return this.get('label')
         .replace(/Street/gi, 'St')
@@ -40,11 +49,13 @@ define([
     },
 
     estimatedBikeCount: function () {
-      return Math.max(0, this.get('availableBikes') - this.confidencePadding());
+      var estimateCount = Math.max(0, this.get('availableBikes') - this.confidencePadding());
+      return estimateCount < 2 ? 0 : estimateCount;
     },
 
     estimatedDockCount: function () {
-      return Math.max(0, this.get('availableDocks') - this.confidencePadding());
+      var estimateCount = Math.max(0, this.get('availableDocks') - this.confidencePadding());
+      return estimateCount < 2 ? 0 : estimateCount;
     },
 
     hasAvailableBikes: function () {
@@ -64,7 +75,8 @@ define([
     }
   },
   {
-    MAX_PADDING: 2
+    MAX_PADDING: 2,
+    SKIP_TIME: 3 * 60 * 1000 // 3 minutes
   });
   _.extend(Station.prototype, WithGeo);
 

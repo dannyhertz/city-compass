@@ -13,7 +13,10 @@ define([
 
     events: {
       'click .mode-btn': 'onModeClick',
-      'touchend .mode-btn': 'onModeClick'
+      'touchend .mode-btn': 'onModeClick',
+
+      'click .skip-btn': 'onSkipClick',
+      'touchend .skip-btn': 'onSkipClick'
     },
 
     initialize: function (opts) {
@@ -37,6 +40,11 @@ define([
 
       this.updateModeToggle(null, targetMode);
       this.currentUser.setSearchMode(targetMode);
+    },
+
+    onSkipClick: function (e) {
+      e.preventDefault();
+      this.currentUser.skipCurrentStation();
     },
 
     updateModeToggle: function (user, mode) {

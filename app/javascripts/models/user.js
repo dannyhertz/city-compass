@@ -32,6 +32,8 @@ define([
 
       this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
+      this.listenTo(this.targetStations, 'change:skipped', this.onStationSkip);
+
       this.listenTo(this, 'change:searchMode', this.sortStations);
     },
 
@@ -84,6 +86,13 @@ define([
       }
     },
 
+    skipCurrentStation: function () {
+      var currStation = this.getNearestStation();
+      if (currStation) {
+        currStation.skip();
+      }
+    },
+
     onStationsSort: function (stations) {
       var nearestStation = stations.first(),
           currentTarget = this.get('targetStation');
@@ -102,6 +111,10 @@ define([
 
       this.trigger('stationpoll:success');
       this.setInitializeFlag('stations');
+    },
+
+    onStationSkip: function (stations) {
+      this.sortStations();
     },
 
     startGeoListening: function () {
