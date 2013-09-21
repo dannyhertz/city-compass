@@ -15,7 +15,7 @@ define([
     },
     geoOptions: {
       enableHighAccuracy: false,
-      timeout: 9000
+      timeout: 5000
     },
     initializedServices: {
       user: false,
@@ -30,7 +30,6 @@ define([
       this.geoApi = window.navigator.geolocation;
       this.targetStations = new Stations(seedStations, { user: this });
 
-      this.pollCounter = 0;
       this.listenTo(this.targetStations, 'sort', this.onStationsSort);
       this.listenTo(this.targetStations, 'change:skipped', this.onStationSkip);
 
@@ -120,23 +119,16 @@ define([
     startGeoListening: function () {
       var user = this;
 
-      this.getCurrentLocation(true);
-      this.fetchTargetStations();
+      user.startPostionWatching();
+      user.fetchTargetStations();
 
-      this.pollingId = setInterval(function () {
-        user.pollCounter += User.TIMER_INTERVAL;
-
-        if (user.pollCounter % User.USER_POLL_INTERVAL === 0 && !this.locationPollInProgress) {
-          user.getCurrentLocation();
-        }
-        if (user.pollCounter % User.STATION_POLL_INTERVAL === 0) {
-          user.fetchTargetStations();
-        }
-      }, User.TIMER_INTERVAL);
+      user.stationPollId = setInterval(function () {
+        user.fetchTargetStations();
+      }, User.STATION_POLL_INTERVAL);
     },
 
     stopGeoListening: function () {
-      clearInterval(this.pollingId);
+      clearInterval(this.stationPollId);
     },
 
     fetchTargetStations: function () {
@@ -144,39 +136,32 @@ define([
       this.trigger('stationpoll:start');
     },
 
-    getCurrentLocation: function () {
-      if (this.locationPollInProgress) { return; }
+    startPostionWatching: function () {
+      var boundSuccess = _.bind(this.onPositionWatchSuccess, this),
+          boundError = _.bind(this.onPositionWatchError, this);
 
-      var boundSuccess = _.bind(this.onCurrentPositionSuccess, this),
-          boundError = _.bind(this.onCurrentPositionError, this);
-
-      this.locationPollInProgress = true;
-      this.trigger('locationpoll:start');
-      this.geoApi.getCurrentPosition(boundSuccess, boundError, this.geoOptions);
+      this.trigger('positionwatch:start');
+      this.geoApi.watchPosition(boundSuccess, boundError, this.geoOptions);
     },
 
-    onCurrentPositionSuccess: function (position) {
+    onPositionWatchSuccess: function (position) {
       var newCoords = _.pick(position.coords, ['latitude', 'longitude']),
           distanceDelta = this.distanceBetween(newCoords);
 
       this.setCoordinates(newCoords);
-      if (!this.targetStations.isEmpty() && (!this.initializedServices.user || distanceDelta > 25)) {
+      if (!this.targetStations.isEmpty() && (!this.initializedServices.user || distanceDelta > 20)) {
         this.sortStations();
       }
 
       this.setInitializeFlag('user');
-      this.locationPollInProgress = false;
-      this.trigger('locationpoll:success', newCoords);
+      this.trigger('positionwatch:success', newCoords);
     },
 
-    onCurrentPositionError: function (err) {
-      this.locationPollInProgress = false;
-      this.trigger('locationpoll:error', err);
+    onPositionWatchError: function (err) {
+      this.trigger('positionwatch:error', err);
     }
   }, {
-    TIMER_INTERVAL: 1000,
-    STATION_POLL_INTERVAL: 20000,
-    USER_POLL_INTERVAL: 10000
+    STATION_POLL_INTERVAL: 15000
   });
   _.extend(User.prototype, WithGeo);
 

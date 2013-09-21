@@ -59,11 +59,11 @@ module.exports = function (grunt) {
         remove: ''
       },
       js: {
-        asset_url: 'build/javascripts/app.min.js',
+        asset_url: 'javascripts/app.min.js',
         file: 'views/index.html.ejs'
       },
       css: {
-        asset_url: 'build/styles/app.min.css',
+        asset_url: 'styles/app.min.css',
         file: 'views/index.html.ejs'
       }
     },

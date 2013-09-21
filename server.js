@@ -8,7 +8,18 @@ var express = require('express'),
 
 // Create server
 var app = express(),
+    cacheOptions = {},
+    staticPath,
     citiClient;
+
+// Env dependent configs
+if (app.get('env') == 'development') {
+  staticPath = 'app';
+  app.use(express.errorHandler());
+} else {
+  staticPath = 'app/build';
+  cacheOptions = { maxAge: 31536000000 };
+}
 
 // Configure server
 app.set('port', process.env.PORT || 3000);
@@ -20,11 +31,7 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'app'), { maxAge: 31536000000 }));
-
-if (app.get('env') == 'development') {
-  app.use(express.errorHandler());
-}
+app.use(express.static(path.join(__dirname, staticPath), cacheOptions));
 
 // Seed data
 var seedStations = require('./seeds/stations-with-mta.json');
